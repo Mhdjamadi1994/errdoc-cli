@@ -1,0 +1,99 @@
+﻿[
+  {
+    "name": "python_repeated_web_traceback",
+    "prefix": ["2026-10-09 10:15:00,101 INFO request received", "Traceback (most recent call last):", "  File \"/srv/app/api.py\", line 42, in handle", "    load_record(record_id)"],
+    "repeat_line": "  File \"/opt/venv/lib/python3.11/site-packages/framework/router.py\", line 88, in dispatch",
+    "repeat_count": 180,
+    "suffix": ["  File \"/srv/app/store.py\", line 21, in load_record", "    raise ValueError(\"invalid record id\")", "ValueError: invalid record id"],
+    "required": ["ValueError: invalid record id", "invalid record id"]
+  },
+  {
+    "name": "linux_service_storm",
+    "prefix": ["service=worker level=INFO started"],
+    "repeat_line": "service=worker level=INFO poll complete",
+    "repeat_count": 500,
+    "suffix": ["service=worker level=ERROR database connection refused"],
+    "required": ["level=ERROR database connection refused"]
+  },
+  {
+    "name": "windows_permission_error",
+    "prefix": ["2026-10-09 12:00:00 INFO Starting scheduled task", "Traceback (most recent call last):", "  File \"C:\\\\apps\\\\worker\\\\main.py\", line 31, in run", "    write_report()"],
+    "repeat_line": "2026-10-09 12:00:01 DEBUG retrying report write",
+    "repeat_count": 120,
+    "suffix": ["PermissionError: [WinError 5] Access is denied: 'C:\\\\reports\\\\daily.csv'"],
+    "required": ["PermissionError: [WinError 5]", "daily.csv"]
+  },
+  {
+    "name": "node_missing_module",
+    "prefix": ["node:internal/modules/cjs/loader:1228"],
+    "repeat_line": "    at Module._compile (node:internal/modules/cjs/loader:1358:14)",
+    "repeat_count": 90,
+    "suffix": ["Error: Cannot find module 'fastify'", "code: 'MODULE_NOT_FOUND'"],
+    "required": ["Cannot find module 'fastify'", "MODULE_NOT_FOUND"]
+  },
+  {
+    "name": "npm_missing_script",
+    "prefix": ["npm verbose cli /usr/bin/node"],
+    "repeat_line": "npm warn deprecated package-one",
+    "repeat_count": 160,
+    "suffix": ["npm ERR! Missing script: \"test\"", "npm ERR! A complete log can be found in: /tmp/npm.log"],
+    "required": ["Missing script", "\"test\""]
+  },
+  {
+    "name": "git_not_repository",
+    "prefix": ["git status --short"],
+    "repeat_line": " M src/module.py",
+    "repeat_count": 80,
+    "suffix": ["fatal: not a git repository (or any of the parent directories): .git"],
+    "required": ["fatal: not a git repository"]
+  },
+  {
+    "name": "dns_resolution_failure",
+    "prefix": ["2026-10-09T12:01:00Z INFO request started"],
+    "repeat_line": "2026-10-09T12:01:01Z DEBUG retrying connection",
+    "repeat_count": 300,
+    "suffix": ["urllib.error.URLError: <urlopen error [Errno 11001] getaddrinfo failed>"],
+    "required": ["getaddrinfo failed"]
+  },
+  {
+    "name": "build_linker_failure",
+    "prefix": ["[ 12%] Building C object src/core.c.o"],
+    "repeat_line": "warning: unused variable 'temporary_value'",
+    "repeat_count": 240,
+    "suffix": ["undefined reference to main", "collect2: error: ld returned 1 exit status"],
+    "required": ["undefined reference to", "ld returned 1"]
+  },
+  {
+    "name": "short_python_value_error",
+    "prefix": ["Traceback (most recent call last):"],
+    "repeat_line": "",
+    "repeat_count": 0,
+    "suffix": ["  File \"app.py\", line 4, in <module>", "    int(\"not-a-number\")", "ValueError: invalid literal for int() with base 10: 'not-a-number'"],
+    "required": ["ValueError: invalid literal", "not-a-number"]
+  },
+  {
+    "name": "secret_redaction_in_application_log",
+    "prefix": ["2026-10-09 INFO starting up"],
+    "repeat_line": "healthcheck=ok",
+    "repeat_count": 220,
+    "suffix": ["Authorization: Bearer abc.def.ghi", "RuntimeError: upstream request failed"],
+    "required": ["Authorization: Bearer [REDACTED]", "RuntimeError: upstream request failed"],
+    "forbidden": ["abc.def.ghi"]
+  },
+  {
+    "name": "go_panic",
+    "prefix": ["goroutine 11 [running]:"],
+    "repeat_line": "net/http.(*conn).serve(0xc0001aa000, {0x7f, 0x90}, 0xc0001)",
+    "repeat_count": 95,
+    "suffix": ["panic: runtime error: invalid memory address or nil pointer dereference", "main.handleRequest()"],
+    "required": ["panic: runtime error", "nil pointer dereference"]
+  },
+  {
+    "name": "python_import_failure",
+    "prefix": ["Traceback (most recent call last):"],
+    "repeat_line": "  File \"/opt/venv/lib/python3.12/site-packages/pkg/module.py\", line 7, in load",
+    "repeat_count": 70,
+    "suffix": ["  File \"/srv/app/main.py\", line 2, in <module>", "ModuleNotFoundError: No module named 'sample_driver'"],
+    "required": ["ModuleNotFoundError: No module named 'sample_driver'", "sample_driver"]
+  }
+]

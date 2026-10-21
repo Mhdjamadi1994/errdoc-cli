@@ -1,0 +1,54 @@
+﻿# Python build and test artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Virtual environments
+.venv/
+.venv*/
+venv/
+
+# Test and tool caches
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Local errdoc configuration and evaluation output
+.errdoc/
+llm-evaluation*.json
+compression-report*.json
+
+# Credentials and private local data
+.env
+.env.*
+!.env.example
+.npmrc
+.pypirc
+.netrc
+.aws/
+.ssh/
+.config/
+.kube/
+.azure/
+.gcloud/
+credentials
+credentials.*
+secrets
+secrets.*
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local logs and database snapshots
+*.log
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.bak

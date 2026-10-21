@@ -1,0 +1,5 @@
+﻿# Historical LLM human review data
+
+`llm-human-review-2026-10-14.csv` records the project owner's 50 human ratings for the `llama3.2` diagnosis run completed on October 14, 2026. Each row contains a synthetic fixture ID, the human correctness class, the four rubric scores, and the final recorded total. For unsafe answers the review tool may force the final total to zero regardless of the rubric subtotal. The original prompt SHA-256 is `f1bacf544cecb75e83ad7feecb76776cb7297aed51b7283b8ddea9d9394df9d9`.
+
+The private local source report remains under `.errdoc/` and is excluded from distribution. This export intentionally omits raw and filtered model answers and local paths. Summary: mean 8.4/10; 21 correct, 25 partially correct, 2 incorrect, 2 unsafe; 3 responses contained raw command/code suggestions. This is historical evidence only: its system prompt differs from the current release candidate, so these scores cannot be reused for that candidate and the sample does not pass the current release gates.

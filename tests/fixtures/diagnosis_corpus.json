@@ -1,0 +1,1240 @@
+[
+    {
+        "id":  "python_syntax_error",
+        "project":  "Python",
+        "error":  "Traceback (most recent call last):\n  File \"app.py\", line 1\n    print(\u0027hello\u0027\n                ^\nSyntaxError: \u0027(\u0027 was never closed",
+        "fact_groups":  [
+                            [
+                                "SyntaxError",
+                                "syntax error"
+                            ],
+                            [
+                                "never closed",
+                                "unclosed"
+                            ],
+                            [
+                                "line 1"
+                            ]
+                        ]
+    },
+    {
+        "id":  "python_module_missing",
+        "project":  "Python",
+        "error":  "Traceback (most recent call last):\n  File \"app.py\", line 1, in \u003cmodule\u003e\n    import sample_driver\nModuleNotFoundError: No module named \u0027sample_driver\u0027",
+        "fact_groups":  [
+                            [
+                                "cannot import",
+                                "could not import",
+                                "not found"
+                            ],
+                            [
+                                "sample_driver"
+                            ],
+                            [
+                                "distribution",
+                                "dependency",
+                                "package"
+                            ]
+                        ]
+    },
+    {
+        "id":  "python_none_subscript",
+        "project":  "Python",
+        "error":  "Traceback (most recent call last):\n  File \"app.py\", line 8, in \u003cmodule\u003e\n    print(result[0])\nTypeError: \u0027NoneType\u0027 object is not subscriptable",
+        "fact_groups":  [
+                            [
+                                "None",
+                                "none"
+                            ],
+                            [
+                                "index",
+                                "subscript"
+                            ],
+                            [
+                                "returned",
+                                "produced",
+                                "assigned"
+                            ]
+                        ]
+    },
+    {
+        "id":  "python_explicit_value_error",
+        "project":  "Python",
+        "error":  "Traceback (most recent call last):\n  File \"app.py\", line 4, in validate\n    raise ValueError(\u0027invalid record id\u0027)\nValueError: invalid record id",
+        "fact_groups":  [
+                            [
+                                "explicitly raising",
+                                "raise ValueError",
+                                "raised ValueError"
+                            ],
+                            [
+                                "invalid record id"
+                            ],
+                            [
+                                "condition",
+                                "input",
+                                "validation"
+                            ]
+                        ]
+    },
+    {
+        "id":  "node_module_missing",
+        "project":  "Node.js",
+        "error":  "Error: Cannot find module \u0027fastify\u0027\nRequire stack:\n- /workspace/server.js\ncode: \u0027MODULE_NOT_FOUND\u0027",
+        "fact_groups":  [
+                            [
+                                "cannot find module",
+                                "module not found"
+                            ],
+                            [
+                                "fastify"
+                            ],
+                            [
+                                "dependency",
+                                "package.json",
+                                "node_modules"
+                            ]
+                        ]
+    },
+    {
+        "id":  "npm_missing_script",
+        "project":  "Node.js",
+        "error":  "npm ERR! Missing script: \"test\"\nnpm ERR! To see a list of scripts, run:\nnpm ERR!   npm run",
+        "fact_groups":  [
+                            [
+                                "missing script",
+                                "script test"
+                            ],
+                            [
+                                "package.json",
+                                "scripts"
+                            ],
+                            [
+                                "npm run"
+                            ]
+                        ]
+    },
+    {
+        "id":  "git_not_repository",
+        "project":  "Git",
+        "error":  "fatal: not a git repository (or any of the parent directories): .git",
+        "fact_groups":  [
+                            [
+                                "not a git repository",
+                                "not inside a git repository"
+                            ],
+                            [
+                                "repository root",
+                                "project directory",
+                                "git repository"
+                            ]
+                        ]
+    },
+    {
+        "id":  "file_permission_denied",
+        "project":  "Python",
+        "error":  "Traceback (most recent call last):\n  File \"worker.py\", line 17, in write_report\n    open(\u0027C:/reports/daily.csv\u0027, \u0027w\u0027)\nPermissionError: [WinError 5] Access is denied: \u0027C:/reports/daily.csv\u0027",
+        "fact_groups":  [
+                            [
+                                "permission",
+                                "access denied"
+                            ],
+                            [
+                                "daily.csv"
+                            ],
+                            [
+                                "account",
+                                "user",
+                                "directory",
+                                "permissions"
+                            ]
+                        ]
+    },
+    {
+        "id":  "dns_lookup_failure",
+        "project":  "Network",
+        "error":  "urllib.error.URLError: \u003curlopen error [Errno 11001] getaddrinfo failed\u003e",
+        "fact_groups":  [
+                            [
+                                "dns",
+                                "name resolution",
+                                "hostname"
+                            ],
+                            [
+                                "getaddrinfo",
+                                "resolve"
+                            ],
+                            [
+                                "network",
+                                "proxy",
+                                "connection"
+                            ]
+                        ]
+    },
+    {
+        "id":  "connection_refused",
+        "project":  "Network",
+        "error":  "ConnectionRefusedError: [Errno 111] Connection refused while connecting to 127.0.0.1:5432",
+        "fact_groups":  [
+                            [
+                                "connection refused"
+                            ],
+                            [
+                                "5432"
+                            ],
+                            [
+                                "service",
+                                "listening",
+                                "port"
+                            ]
+                        ]
+    },
+    {
+        "id":  "http_endpoint_404",
+        "project":  "API",
+        "error":  "LLM endpoint returned HTTP 404: route /v1/chat/completions not found",
+        "fact_groups":  [
+                            [
+                                "404",
+                                "not found"
+                            ],
+                            [
+                                "endpoint",
+                                "route",
+                                "path"
+                            ],
+                            [
+                                "base url",
+                                "api version",
+                                "/v1"
+                            ]
+                        ]
+    },
+    {
+        "id":  "python_file_missing",
+        "project":  "Python",
+        "error":  "Traceback (most recent call last):\n  File \"runner.py\", line 5, in \u003cmodule\u003e\n    open(\u0027data/input.csv\u0027)\nFileNotFoundError: [Errno 2] No such file or directory: \u0027data/input.csv\u0027",
+        "fact_groups":  [
+                            [
+                                "file not found",
+                                "does not exist",
+                                "missing file"
+                            ],
+                            [
+                                "data/input.csv"
+                            ],
+                            [
+                                "working directory",
+                                "path",
+                                "file location"
+                            ]
+                        ]
+    },
+    {
+        "id":  "python_type_mismatch",
+        "project":  "Python",
+        "error":  "Traceback (most recent call last):\r\n  File \"app.py\", line 5, in total\r\n    result = \"items: \" + 3\r\nTypeError: can only concatenate str (not \"int\") to str",
+        "fact_groups":  [
+                            [
+                                "can only concatenate",
+                                "concatenate"
+                            ],
+                            [
+                                "str",
+                                "string"
+                            ],
+                            [
+                                "int",
+                                "integer"
+                            ],
+                            [
+                                "convert",
+                                "type mismatch",
+                                "different types"
+                            ]
+                        ]
+    }
+  ,
+  {
+    "id": "python_unsupported_operand",
+    "project": "Python",
+    "error": "Traceback (most recent call last):\n  File \"app.py\", line 9, in total\n    return left + right\nTypeError: unsupported operand type(s) for +: 'int' and 'str'",
+    "fact_groups": [["unsupported operand", "typeerror"], ["int", "integer"], ["str", "string"], ["types", "convert", "operation"]]
+  },
+  {
+    "id": "django_settings_missing",
+    "project": "Django",
+    "error": "django.core.exceptions.ImproperlyConfigured: Requested setting INSTALLED_APPS, but settings are not configured. You must either define the environment variable DJANGO_SETTINGS_MODULE or call settings.configure() before accessing settings.",
+    "fact_groups": [["settings are not configured", "not configured"], ["DJANGO_SETTINGS_MODULE", "settings.configure"], ["INSTALLED_APPS"]]
+  },
+  {
+    "id": "django_relation_missing",
+    "project": "Django/PostgreSQL",
+    "error": "django.db.utils.ProgrammingError: relation \"orders_invoice\" does not exist\nLINE 1: SELECT * FROM orders_invoice",
+    "fact_groups": [["relation", "table"], ["orders_invoice"], ["migration", "schema", "database"]]
+  },
+  {
+    "id": "node_port_in_use",
+    "project": "Node.js",
+    "error": "Error: listen EADDRINUSE: address already in use :::3000\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)",
+    "fact_groups": [["EADDRINUSE", "already in use"], ["3000"], ["port", "listener", "process"]]
+  },
+  {
+    "id": "node_undefined_method",
+    "project": "Node.js",
+    "error": "TypeError: Cannot read properties of undefined (reading 'map')\n    at renderItems (/workspace/src/view.js:24:19)",
+    "fact_groups": [["undefined"], ["map"], ["renderItems", "view.js"], ["assigned", "returned", "initialized"]]
+  },
+  {
+    "id": "npm_peer_dependency_conflict",
+    "project": "Node.js",
+    "error": "npm ERR! code ERESOLVE\nnpm ERR! ERESOLVE unable to resolve dependency tree\nnpm ERR! peer react@\"^18\" from ui-widget@4.2.0\nnpm ERR! Found: react@19.0.0",
+    "fact_groups": [["ERESOLVE", "dependency tree"], ["react 18", "^18"], ["react 19", "19.0.0"], ["peer dependency"]]
+  },
+  {
+    "id": "git_merge_conflict",
+    "project": "Git",
+    "error": "src/config.py: needs merge\nerror: you need to resolve your current index first\nCONFLICT (content): Merge conflict in src/config.py",
+    "fact_groups": [["merge conflict", "conflict"], ["src/config.py"], ["resolve", "merge markers", "index"]]
+  },
+  {
+    "id": "cmake_missing_openssl",
+    "project": "CMake/C++",
+    "error": "CMake Error at CMakeLists.txt:18 (find_package):\n  Could not find a package configuration file provided by \"OpenSSL\" with any of the following names:\n    OpenSSLConfig.cmake\n    openssl-config.cmake",
+    "fact_groups": [["could not find", "missing"], ["OpenSSL", "OpenSSLConfig.cmake"], ["CMAKE_PREFIX_PATH", "development package", "config file"]]
+  },
+  {
+    "id": "cargo_crate_not_found",
+    "project": "Rust/Cargo",
+    "error": "error[E0432]: unresolved import `serde_json`\n --> src/main.rs:2:5\n  | use serde_json::Value;\n  |     ^^^^^^^^^^ no external crate `serde_json`",
+    "fact_groups": [["unresolved import", "no external crate"], ["serde_json"], ["Cargo.toml", "dependency"]]
+  },
+  {
+    "id": "docker_registry_denied",
+    "project": "Docker",
+    "error": "failed to solve: pull access denied for example/private-api, repository does not exist or may require 'docker login': denied: requested access to the resource is denied",
+    "fact_groups": [["pull access denied", "access is denied"], ["example/private-api"], ["repository", "registry", "permissions", "authentication"]]
+  },
+  {
+    "id": "shell_command_missing",
+    "project": "Shell/Packaging",
+    "error": "./scripts/build.sh: line 8: pdm: command not found",
+    "fact_groups": [["command not found", "pdm"], ["line 8", "build.sh"], ["installed", "PATH", "environment"]]
+  },
+  {
+    "id": "json_syntax_error",
+    "project": "JSON Configuration",
+    "error": "json.decoder.JSONDecodeError: Expecting ',' delimiter: line 12 column 3 (char 211)",
+    "fact_groups": [["JSONDecodeError", "invalid JSON"], ["line 12", "column 3"], ["comma", "delimiter", "syntax"]]
+  },
+  {
+    "id": "pytest_fixture_missing",
+    "project": "Python/pytest",
+    "error": "________________ ERROR at setup of test_api_client _________________\nfile tests/test_api.py, line 7\n  def test_api_client(client):\nE       fixture 'client' not found\n>       available fixtures: capsys, monkeypatch, tmp_path",
+    "fact_groups": [["fixture", "client"], ["not found", "not defined"], ["conftest.py", "fixture definition", "pytest_plugins"]]
+  },
+  {
+    "id": "postgres_connection_slots_exhausted",
+    "project": "PostgreSQL",
+    "error": "psycopg.OperationalError: connection failed: FATAL: remaining connection slots are reserved for non-replication superuser connections",
+    "fact_groups": [["connection slots", "too many connections"], ["PostgreSQL", "postgres"], ["connection pool", "close idle connections", "pool size"]]
+  },
+  {
+    "id": "go_module_missing",
+    "project": "Go Modules",
+    "error": "main.go:4:2: no required module provides package github.com/example/cookbook; to add it:\n\tgo get github.com/example/cookbook",
+    "fact_groups": [["no required module", "package"], ["github.com/example/cookbook"], ["go.mod", "module path", "dependency"]]
+  },
+  {
+    "id": "java_classpath_missing",
+    "project": "Java/JVM",
+    "error": "Exception in thread \"main\" java.lang.NoClassDefFoundError: com/example/report/ReportClient\n    at com.example.app.Main.run(Main.java:42)\nCaused by: java.lang.ClassNotFoundException: com.example.report.ReportClient",
+    "fact_groups": [["NoClassDefFoundError", "ClassNotFoundException"], ["ReportClient"], ["classpath", "runtime dependency", "jar"]]
+  },
+  {
+    "id": "spring_missing_bean",
+    "project": "Java/Spring",
+    "error": "org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'com.example.billing.InvoiceGateway' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@Autowired}",
+    "fact_groups": [["NoSuchBeanDefinitionException", "no qualifying bean"], ["InvoiceGateway"], ["component scan", "bean definition", "configuration"]]
+  },
+  {
+    "id": "kubernetes_image_pull_backoff",
+    "project": "Kubernetes",
+    "error": "Warning  Failed  kubelet  Failed to pull image \"registry.example.invalid/payments/api:v9\": pull access denied, repository may not exist or may require authorization\nWarning  BackOff kubelet Back-off pulling image \"registry.example.invalid/payments/api:v9\"",
+    "fact_groups": [["BackOff", "Failed to pull image"], ["registry.example.invalid/payments/api:v9"], ["image name", "tag", "registry permissions", "pull secret"]]
+  },
+  {
+    "id": "terraform_invalid_index",
+    "project": "Terraform",
+    "error": "Error: Invalid index\n  on modules/network/main.tf line 18, in output \"subnet_id\":\n  18: value = aws_subnet.private[2].id\nThe given key does not identify an element in this collection value.",
+    "fact_groups": [["Invalid index", "does not identify an element"], ["private[2]", "index 2"], ["collection", "count", "for_each", "length"]],
+    "must_not_contain": ["still being created"]
+  },
+  {
+    "id": "terraform_state_lock",
+    "project": "Terraform",
+    "error": "Error acquiring the state lock: ConditionalCheckFailedException: The conditional request failed.\nLock Info:\n  ID:        9ab3c8d0-lock-55\n  Operation: OperationTypeApply\n  Who:       build-agent",
+    "fact_groups": [["state lock", "Error acquiring"], ["ConditionalCheckFailedException", "conditional request failed"], ["Who", "build-agent"], ["active operation", "stale lock", "backend"]],
+    "must_not_contain": ["terraform validate", "circular dependencies", "force-unlock"]
+  },
+  {
+    "id": "mysql_access_denied",
+    "project": "MySQL",
+    "error": "pymysql.err.OperationalError: (1045, \"Access denied for user 'svc_reader'@'10.0.4.15' (using password: YES)\")",
+    "fact_groups": [["Access denied", "1045"], ["svc_reader", "10.0.4.15"], ["credentials", "grants", "host-based access"]]
+  },
+  {
+    "id": "sqlalchemy_unique_constraint",
+    "project": "Python/SQLAlchemy",
+    "error": "sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) UNIQUE constraint failed: accounts_user.email\n[SQL: INSERT INTO accounts_user (email) VALUES (?)]\n[parameters: ('person@example.invalid',)]",
+    "fact_groups": [["IntegrityError", "UNIQUE constraint failed"], ["accounts_user.email", "email"], ["duplicate", "unique constraint", "existing row"]]
+  },
+  {
+    "id": "powershell_execution_policy",
+    "project": "Windows PowerShell",
+    "error": "File C:\\work\\project\\.venv\\Scripts\\Activate.ps1 cannot be loaded because running scripts is disabled on this system. For more information, see about_Execution_Policies.",
+    "fact_groups": [["running scripts is disabled", "Execution_Policies"], ["Activate.ps1"], ["policy", "process scope", "organization policy"]]
+  },
+  {
+    "id": "windows_dll_load_failure",
+    "project": "Windows/Python",
+    "error": "ImportError: DLL load failed while importing _core: The specified module could not be found.\n  File \"C:\\work\\venv\\Lib\\site-packages\\numpy\\_core\\_multiarray_umath.cp314-win_amd64.pyd\"",
+    "fact_groups": [["DLL load failed", "module could not be found"], ["numpy", "_multiarray_umath"], ["architecture", "runtime DLL", "binary wheel", "environment"]]
+  },
+  {
+    "id": "make_target_missing",
+    "project": "GNU Make",
+    "error": "make: *** No rule to make target 'release'. Stop.",
+    "fact_groups": [["No rule to make target", "target 'release'"], ["release"], ["Makefile", "target name", "included makefile"]]
+  },
+  {
+    "id": "http_rate_limited",
+    "project": "HTTP API",
+    "error": "requests.exceptions.HTTPError: 429 Client Error: Too Many Requests for url: https://api.example.invalid/v2/jobs\nRetry-After: 30",
+    "fact_groups": [["429", "Too Many Requests"], ["api.example.invalid/v2/jobs"], ["Retry-After", "rate limit", "request frequency"]],
+    "must_not_contain": ["API endpoint and its intended behavior are unknown"]
+  },
+  {
+    "id": "tls_certificate_untrusted",
+    "project": "TLS/Networking",
+    "error": "ssl.SSLCertVerificationError: certificate verify failed: unable to get local issuer certificate (_ssl.c:1006)",
+    "fact_groups": [["SSLCertVerificationError", "certificate verify failed"], ["local issuer certificate"], ["CA bundle", "system clock", "proxy interception", "certificate chain"]],
+    "must_not_contain": ["self-signed"]
+  },
+  {
+    "id": "python_unicode_decode_failure",
+    "project": "Python",
+    "error": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x96 in position 41: invalid start byte",
+    "fact_groups": [["UnicodeDecodeError", "utf-8"], ["byte 0x96", "position 41"], ["encoding", "source file", "decode"]]
+  },
+  {
+    "id": "jvm_heap_exhausted",
+    "project": "Java/JVM",
+    "error": "Exception in thread \"worker-3\" java.lang.OutOfMemoryError: Java heap space\n    at com.example.importer.CsvParser.parse(CsvParser.java:118)",
+    "fact_groups": [["OutOfMemoryError", "Java heap space"], ["CsvParser.parse", "CsvParser.java:118"], ["heap", "allocation", "retained objects", "batch size"]]
+  },
+  {
+    "id": "python_disk_full",
+    "project": "Python/Filesystem",
+    "error": "Traceback (most recent call last):\n  File \"writer.py\", line 28, in save_archive\nOSError: [Errno 28] No space left on device",
+    "fact_groups": [["No space left on device", "Errno 28"], ["save_archive", "writer.py"], ["disk space", "quota", "temporary files"]]
+  },
+  {
+    "id": "http_proxy_tunnel_failure",
+    "project": "Proxy/Networking",
+    "error": "urllib.error.URLError: <urlopen error Tunnel connection failed: 407 Proxy Authentication Required>",
+    "fact_groups": [["407", "Proxy Authentication Required"], ["Tunnel connection failed"], ["proxy credentials", "proxy configuration", "network policy"]]
+  },
+  {
+    "id": "python_key_missing",
+    "project": "Python",
+    "error": "Traceback (most recent call last):\n  File \"report.py\", line 33, in build_row\n    customer_id = record['customer_id']\nKeyError: 'customer_id'",
+    "fact_groups": [["KeyError", "missing key"], ["customer_id"], ["mapping", "input record", "schema"]]
+  },
+  {
+    "id": "kubernetes_crashloop_oom",
+    "project": "Kubernetes",
+    "error": "Last State: Terminated\n  Reason: OOMKilled\n  Exit Code: 137\nState: Waiting\n  Reason: CrashLoopBackOff\nRestart Count: 9",
+    "fact_groups": [["OOMKilled", "out of memory"], ["CrashLoopBackOff", "Restart Count"], ["memory limit", "working set", "container logs"]],
+    "must_not_contain": ["segmentation fault", "core dump", "maximum restart count", "restart count has reached its maximum limit", "Terraform state", "unlock the state", "operation causing the OOM is still active"]
+  },
+  {
+    "id": "java_class_version_mismatch",
+    "project": "Java/JVM",
+    "error": "java.lang.UnsupportedClassVersionError: com/example/BatchRunner has been compiled by a more recent version of the Java Runtime (class file version 65.0), this version of the Java Runtime only recognizes class file versions up to 61.0",
+    "fact_groups": [["UnsupportedClassVersionError", "more recent version"], ["65.0", "61.0"], ["runtime", "compiler", "Java version"]]
+  },
+  {
+    "id": "npm_registry_connection_reset",
+    "project": "Node.js/npm",
+    "error": "npm ERR! code ECONNRESET\nnpm ERR! network socket hang up\nnpm ERR! network This is a problem related to network connectivity.\nnpm ERR! network In most cases you are behind a proxy or have bad network settings.",
+    "fact_groups": [["ECONNRESET", "socket hang up"], ["network connectivity"], ["proxy", "registry", "TLS", "firewall"]]
+  },
+  {
+    "id": "python_circular_import",
+    "project": "Python",
+    "error": "Traceback (most recent call last):\n  File \"service.py\", line 2, in <module>\n    from client import Client\nImportError: cannot import name 'Client' from partially initialized module 'client' (most likely due to a circular import) (client.py)",
+    "fact_groups": [["ImportError", "cannot import name"], ["partially initialized", "circular import"], ["client", "import cycle", "module dependency"]]
+  },
+  {
+    "id": "node_require_esm",
+    "project": "Node.js",
+    "error": "Error [ERR_REQUIRE_ESM]: require() of ES Module /workspace/node_modules/modern-lib/index.js from /workspace/app.cjs not supported. Instead change the require of index.js in app.cjs to a dynamic import() which is available in all CommonJS modules.",
+    "fact_groups": [["ERR_REQUIRE_ESM"], ["require()", "CommonJS"], ["ES Module", "ESM"], ["dynamic import", "module type"]],
+    "must_not_contain": ["import { someFunction"]
+  },
+  {
+    "id": "kubernetes_readiness_probe_503",
+    "project": "Kubernetes",
+    "error": "Warning Unhealthy\nReadiness probe failed: HTTP probe failed with statuscode: 503\nPod: api-7c9f8d\nContainer: api",
+    "fact_groups": [["Readiness probe failed", "Unhealthy"], ["503"], ["readiness probe", "application health endpoint", "container logs"]],
+    "must_not_contain": ["service that the readiness probe is targeting"]
+  },
+  {
+    "id": "extended_py_recursion_limit",
+    "project": "Python",
+    "error": "RecursionError: maximum recursion depth exceeded while calling a Python object",
+    "fact_groups": [
+      [
+        "RecursionError"
+      ],
+      [
+        "maximum recursion depth"
+      ],
+      [
+        "recursive call",
+        "base case"
+      ]
+    ]
+  },
+  {
+    "id": "extended_py_division_zero",
+    "project": "Python",
+    "error": "ZeroDivisionError: division by zero in billing.py:74",
+    "fact_groups": [
+      [
+        "ZeroDivisionError"
+      ],
+      [
+        "division by zero"
+      ],
+      [
+        "denominator",
+        "billing.py:74"
+      ]
+    ]
+  },
+  {
+    "id": "extended_py_ascii_encoding",
+    "project": "Python",
+    "error": "UnicodeEncodeError: 'ascii' codec can't encode character at position 12: ordinal not in range(128)",
+    "fact_groups": [
+      [
+        "UnicodeEncodeError",
+        "ascii"
+      ],
+      [
+        "position 12"
+      ],
+      [
+        "encoding",
+        "output",
+        "codec"
+      ]
+    ]
+  },
+  {
+    "id": "extended_py_pickle_local",
+    "project": "Python",
+    "error": "AttributeError: Can't pickle local object 'build_task.<locals>.<lambda>'",
+    "fact_groups": [
+      [
+        "Can't pickle",
+        "AttributeError"
+      ],
+      [
+        "local object",
+        "lambda"
+      ],
+      [
+        "top-level",
+        "picklable",
+        "multiprocessing"
+      ]
+    ]
+  },
+  {
+    "id": "extended_py_mp_bootstrap",
+    "project": "Python",
+    "error": "RuntimeError: An attempt has been made to start a new process before the current process has finished its bootstrapping phase.",
+    "fact_groups": [
+      [
+        "RuntimeError"
+      ],
+      [
+        "start a new process",
+        "bootstrapping phase"
+      ],
+      [
+        "main guard",
+        "spawn"
+      ]
+    ]
+  },
+  {
+    "id": "extended_http_502",
+    "project": "HTTP/API",
+    "error": "HTTPError: 502 Bad Gateway for https://api.example.invalid/v3/reports",
+    "fact_groups": [
+      [
+        "502",
+        "Bad Gateway"
+      ],
+      [
+        "api.example.invalid/v3/reports"
+      ],
+      [
+        "upstream",
+        "gateway",
+        "proxy"
+      ]
+    ]
+  },
+  {
+    "id": "extended_http_503_retry",
+    "project": "HTTP/API",
+    "error": "HTTP/1.1 503 Service Unavailable\nRetry-After: 45\nEndpoint: https://api.example.invalid/v1/inventory",
+    "fact_groups": [
+      [
+        "503",
+        "Service Unavailable"
+      ],
+      [
+        "Retry-After",
+        "45"
+      ],
+      [
+        "api.example.invalid/v1/inventory"
+      ]
+    ]
+  },
+  {
+    "id": "extended_http_401",
+    "project": "HTTP/API",
+    "error": "HTTPError: 401 Unauthorized for https://api.example.invalid/v2/profile",
+    "fact_groups": [
+      [
+        "401",
+        "Unauthorized"
+      ],
+      [
+        "api.example.invalid/v2/profile"
+      ],
+      [
+        "authentication",
+        "credentials",
+        "authorization"
+      ]
+    ],
+    "must_not_contain": [
+      "print the token",
+      "log the authorization header"
+    ]
+  },
+  {
+    "id": "extended_http_504",
+    "project": "HTTP/API",
+    "error": "HTTPError: 504 Gateway Timeout\nGET https://reports.example.invalid/v1/daily\nDuration: 30 seconds",
+    "fact_groups": [
+      [
+        "504",
+        "Gateway Timeout"
+      ],
+      [
+        "reports.example.invalid/v1/daily"
+      ],
+      [
+        "timeout",
+        "upstream",
+        "duration"
+      ]
+    ]
+  },
+  {
+    "id": "extended_dns_resolver_failure",
+    "project": "Networking",
+    "error": "dns.resolver.NoNameservers: All nameservers failed for db.internal.example.invalid IN A: SERVFAIL",
+    "fact_groups": [
+      [
+        "NoNameservers",
+        "SERVFAIL"
+      ],
+      [
+        "db.internal.example.invalid"
+      ],
+      [
+        "DNS",
+        "resolver",
+        "nameserver"
+      ]
+    ]
+  },
+  {
+    "id": "extended_tcp_reset",
+    "project": "Networking",
+    "error": "ConnectionResetError: [Errno 104] Connection reset by peer at 10.20.30.40:8443",
+    "fact_groups": [
+      [
+        "ConnectionResetError",
+        "connection reset"
+      ],
+      [
+        "10.20.30.40:8443"
+      ],
+      [
+        "peer",
+        "network",
+        "remote service"
+      ]
+    ]
+  },
+  {
+    "id": "extended_git_non_fast_forward",
+    "project": "Git",
+    "error": "! [rejected] feature/report -> feature/report (non-fast-forward)\nerror: failed to push some refs",
+    "fact_groups": [
+      [
+        "non-fast-forward",
+        "rejected"
+      ],
+      [
+        "feature/report"
+      ],
+      [
+        "remote contains commits",
+        "integrate"
+      ]
+    ],
+    "must_not_contain": [
+      "git push --force",
+      "git reset --hard"
+    ]
+  },
+  {
+    "id": "extended_git_detached_head",
+    "project": "Git",
+    "error": "You are in 'detached HEAD' state. Commits made here are not attached to a branch.",
+    "fact_groups": [
+      [
+        "detached HEAD"
+      ],
+      [
+        "commit",
+        "branch"
+      ],
+      [
+        "branch reference",
+        "preserve commit"
+      ]
+    ]
+  },
+  {
+    "id": "extended_git_no_upstream",
+    "project": "Git",
+    "error": "fatal: The current branch feature/cleanup has no upstream branch.",
+    "fact_groups": [
+      [
+        "no upstream branch"
+      ],
+      [
+        "feature/cleanup"
+      ],
+      [
+        "tracking branch",
+        "remote branch",
+        "upstream"
+      ]
+    ],
+    "must_not_contain": ["detached HEAD", "git checkout -b", "git merge"]
+  },
+  {
+    "id": "extended_npm_etarget",
+    "project": "Node.js/npm",
+    "error": "npm ERR! code ETARGET\nNo matching version found for modern-lib@^9.4.0.",
+    "fact_groups": [
+      [
+        "ETARGET",
+        "No matching version"
+      ],
+      [
+        "modern-lib@^9.4.0"
+      ],
+      [
+        "registry",
+        "version range",
+        "manifest"
+      ]
+    ],
+    "must_not_contain": ["npm install", "specific-version", "installing a different version"]
+  },
+  {
+    "id": "extended_npm_eintegrity",
+    "project": "Node.js/npm",
+    "error": "npm ERR! code EINTEGRITY\nsha512 checksum failed: wanted sha512-expected but got sha512-received",
+    "fact_groups": [
+      [
+        "EINTEGRITY",
+        "checksum failed"
+      ],
+      [
+        "sha512"
+      ],
+      [
+        "cache",
+        "registry",
+        "lockfile"
+      ]
+    ]
+  },
+  {
+    "id": "extended_node_unhandled_rejection",
+    "project": "Node.js",
+    "error": "node:internal/process/promises:289\ntriggerUncaughtException(err, true /* fromPromise */);\nError: payment provider request timed out\n at submitPayment (/workspace/src/payment.js:81:11)",
+    "fact_groups": [
+      [
+        "triggerUncaughtException",
+        "unhandled"
+      ],
+      [
+        "payment provider request timed out"
+      ],
+      [
+        "submitPayment",
+        "payment.js:81",
+        "promise rejection"
+      ]
+    ]
+  },
+  {
+    "id": "extended_java_no_such_method",
+    "project": "Java/JVM",
+    "error": "java.lang.NoSuchMethodError: com.example.UserRepository.findByEmail(java.lang.String)",
+    "fact_groups": [
+      [
+        "NoSuchMethodError"
+      ],
+      [
+        "findByEmail",
+        "UserRepository"
+      ],
+      [
+        "binary version",
+        "dependency version",
+        "method signature"
+      ]
+    ]
+  },
+  {
+    "id": "extended_java_class_cast",
+    "project": "Java/JVM",
+    "error": "java.lang.ClassCastException: java.lang.Long cannot be cast to java.lang.Integer at Counter.java:57",
+    "fact_groups": [
+      [
+        "ClassCastException"
+      ],
+      [
+        "Long",
+        "Integer"
+      ],
+      [
+        "Counter.java:57"
+      ],
+      [
+        "type conversion"
+      ]
+    ]
+  },
+  {
+    "id": "extended_java_pool_timeout",
+    "project": "Java/JVM",
+    "error": "HikariPool$PoolInitializationException: Connection is not available, request timed out after 30000ms.",
+    "fact_groups": [
+      [
+        "PoolInitializationException",
+        "Connection is not available"
+      ],
+      [
+        "30000ms",
+        "timed out"
+      ],
+      [
+        "database connectivity",
+        "pool capacity"
+      ]
+    ]
+  },
+  {
+    "id": "extended_maven_missing_artifact",
+    "project": "Java/Maven",
+    "error": "Could not resolve dependencies for com.example:invoice-api: Could not find artifact com.example:ledger-client:4.1.0 in central",
+    "fact_groups": [
+      [
+        "Could not resolve dependencies",
+        "Could not find artifact"
+      ],
+      [
+        "com.example:ledger-client",
+        "4.1.0"
+      ],
+      [
+        "repository",
+        "artifact coordinates"
+      ]
+    ]
+  },
+  {
+    "id": "extended_go_checksum",
+    "project": "Go",
+    "error": "verifying example.com/ledger@v1.8.2: checksum mismatch\ndownloaded: h1:aaaa\ngo.sum: h1:bbbb",
+    "fact_groups": [
+      [
+        "checksum mismatch"
+      ],
+      [
+        "example.com/ledger",
+        "v1.8.2"
+      ],
+      [
+        "go.sum",
+        "downloaded",
+        "module integrity"
+      ]
+    ],
+    "must_not_contain": [
+      "disable checksum verification",
+      "GOSUMDB=off"
+    ]
+  },
+  {
+    "id": "extended_go_undefined",
+    "project": "Go",
+    "error": "./handler.go:42:9: undefined: NewReportClient",
+    "fact_groups": [
+      [
+        "undefined"
+      ],
+      [
+        "NewReportClient"
+      ],
+      [
+        "handler.go:42",
+        "package",
+        "declaration"
+      ]
+    ]
+  },
+  {
+    "id": "extended_rust_borrow",
+    "project": "Rust",
+    "error": "error[E0502]: cannot borrow items as mutable because it is also borrowed as immutable at src/store.rs:31",
+    "fact_groups": [
+      [
+        "E0502",
+        "cannot borrow"
+      ],
+      [
+        "mutable",
+        "immutably"
+      ],
+      [
+        "items",
+        "src/store.rs:31",
+        "borrow lifetime"
+      ]
+    ]
+  },
+  {
+    "id": "extended_rust_trait",
+    "project": "Rust",
+    "error": "error[E0277]: the trait bound Invoice: Serialize is not satisfied at src/export.rs:19",
+    "fact_groups": [
+      [
+        "E0277",
+        "trait bound"
+      ],
+      [
+        "Invoice",
+        "Serialize"
+      ],
+      [
+        "src/export.rs:19",
+        "implementation",
+        "derive"
+      ]
+    ]
+  },
+  {
+    "id": "extended_tf_for_each",
+    "project": "Terraform",
+    "error": "Error: Invalid for_each argument\n  on modules/iam/main.tf line 24:\nfor_each = local.service_accounts depends on values known only after apply.",
+    "fact_groups": [
+      [
+        "Invalid for_each argument"
+      ],
+      [
+        "local.service_accounts"
+      ],
+      [
+        "known before apply",
+        "resource attributes"
+      ]
+    ]
+  },
+  {
+    "id": "extended_tf_unsupported_attribute",
+    "project": "Terraform",
+    "error": "Error: Unsupported attribute\noutputs.tf line 11: value = module.network.vpc_identifier\nThis object has no attribute named vpc_identifier.",
+    "fact_groups": [
+      [
+        "Unsupported attribute"
+      ],
+      [
+        "vpc_identifier"
+      ],
+      [
+        "module.network",
+        "output",
+        "declared attribute"
+      ]
+    ]
+  },
+  {
+    "id": "extended_tf_provider_config",
+    "project": "Terraform",
+    "error": "Error: Provider configuration not present\nmodule.storage requires provider registry.terraform.io/hashicorp/aws.west, but it has been removed.",
+    "fact_groups": [
+      [
+        "Provider configuration not present"
+      ],
+      [
+        "hashicorp/aws.west"
+      ],
+      [
+        "state",
+        "provider alias",
+        "configuration"
+      ]
+    ]
+  },
+  {
+    "id": "extended_k8s_pvc_pending",
+    "project": "Kubernetes",
+    "error": "Warning FailedScheduling: pod has unbound immediate PersistentVolumeClaims\nPod: reports-0\nClaim: reports-data",
+    "fact_groups": [
+      [
+        "FailedScheduling",
+        "unbound"
+      ],
+      [
+        "PersistentVolumeClaims",
+        "reports-data"
+      ],
+      [
+        "storage class",
+        "persistent volume",
+        "claim"
+      ]
+    ]
+  },
+  {
+    "id": "extended_k8s_liveness_500",
+    "project": "Kubernetes",
+    "error": "Warning Unhealthy\nLiveness probe failed: HTTP probe failed with statuscode: 500\nPod: worker-6d4c\nContainer: worker",
+    "fact_groups": [
+      [
+        "Liveness probe failed",
+        "Unhealthy"
+      ],
+      [
+        "500"
+      ],
+      [
+        "probe endpoint",
+        "container logs",
+        "application health"
+      ]
+    ],
+    "must_not_contain": [
+      "Terraform state",
+      "unlock the state",
+      "maximum restart count"
+    ]
+  },
+  {
+    "id": "extended_k8s_image_pull",
+    "project": "Kubernetes",
+    "error": "Pod api-5f94 State Waiting Reason ImagePullBackOff\nBack-off pulling image registry.example.invalid/team/api:v7",
+    "fact_groups": [
+      [
+        "ImagePullBackOff",
+        "Back-off pulling image"
+      ],
+      [
+        "registry.example.invalid/team/api:v7"
+      ],
+      [
+        "tag",
+        "registry credentials",
+        "registry access"
+      ]
+    ]
+  },
+  {
+    "id": "extended_docker_port_allocated",
+    "project": "Docker",
+    "error": "Error response from daemon: Bind for 0.0.0.0:8080 failed: port is already allocated",
+    "fact_groups": [
+      [
+        "port is already allocated",
+        "Bind"
+      ],
+      [
+        "0.0.0.0:8080"
+      ],
+      [
+        "host port",
+        "port mapping",
+        "existing listener"
+      ]
+    ]
+  },
+  {
+    "id": "extended_postgres_deadlock",
+    "project": "PostgreSQL",
+    "error": "psycopg.errors.DeadlockDetected: deadlock detected\nProcess 184 waits for transaction 732; blocked by process 201.",
+    "fact_groups": [
+      [
+        "DeadlockDetected",
+        "deadlock detected"
+      ],
+      [
+        "Process 184",
+        "process 201"
+      ],
+      [
+        "transaction",
+        "lock order",
+        "concurrent transactions"
+      ]
+    ]
+  },
+  {
+    "id": "extended_mysql_lock_timeout",
+    "project": "MySQL",
+    "error": "mysql.connector.errors.DatabaseError: 1205 (HY000): Lock wait timeout exceeded",
+    "fact_groups": [
+      [
+        "1205",
+        "Lock wait timeout"
+      ],
+      [
+        "transaction"
+      ],
+      [
+        "blocking transaction",
+        "lock",
+        "timeout"
+      ]
+    ]
+  },
+  {
+    "id": "extended_java_unsupported_class_version",
+    "project": "Java/JVM",
+    "error": "java.lang.UnsupportedClassVersionError: com/example/ReportClient has been compiled by a more recent version of the Java Runtime (class file version 65.0), this version of the Java Runtime only recognizes class file versions up to 61.0",
+    "fact_groups": [
+      [
+        "UnsupportedClassVersionError",
+        "more recent version"
+      ],
+      [
+        "class file version 65.0"
+      ],
+      [
+        "recognizes class file versions up to 61.0"
+      ],
+      [
+        "runtime",
+        "compile target",
+        "Java version"
+      ]
+    ],
+    "must_not_contain": ["NoClassDefFoundError", "ClassNotFoundException"]
+  },
+  {
+    "id": "extended_dotnet_assembly_load_failure",
+    "project": "C#/.NET",
+    "error": "System.IO.FileNotFoundException: Could not load file or assembly 'Contoso.Reporting, Version=3.2.0.0, Culture=neutral, PublicKeyToken=null'. The system cannot find the file specified.",
+    "fact_groups": [
+      [
+        "FileNotFoundException"
+      ],
+      [
+        "Contoso.Reporting"
+      ],
+      [
+        "Version=3.2.0.0"
+      ],
+      [
+        "assembly",
+        "deployment output",
+        "assembly resolution"
+      ]
+    ]
+  },
+  {
+    "id": "extended_python_undefined_extension_symbol",
+    "project": "Python",
+    "error": "ImportError: /opt/app/venv/lib/python3.14/site-packages/sample_ext.cpython-314-x86_64-linux-gnu.so: undefined symbol: PyInit_sample_ext",
+    "fact_groups": [
+      [
+        "ImportError",
+        "undefined symbol"
+      ],
+      [
+        "PyInit_sample_ext"
+      ],
+      [
+        "sample_ext.cpython-314-x86_64-linux-gnu.so"
+      ],
+      [
+        "extension module",
+        "module name",
+        "initializer"
+      ]
+    ]
+  },
+  {
+    "id": "extended_python_recursion_error",
+    "project": "Python",
+    "error": "RecursionError: maximum recursion depth exceeded while calling a Python object",
+    "fact_groups": [
+      ["RecursionError"],
+      ["maximum recursion depth"],
+      ["recursive call", "call stack"],
+      ["base case", "cycle", "termination condition"]
+    ],
+    "must_not_contain": ["sys.setrecursionlimit", "increase the recursion limit"]
+  },
+  {
+    "id": "extended_java_no_such_method_signature",
+    "project": "Java/JVM",
+    "error": "Exception in thread \"main\" java.lang.NoSuchMethodError: 'void com.example.billing.InvoiceGateway.charge(java.lang.String)'",
+    "fact_groups": [
+      ["NoSuchMethodError"],
+      ["InvoiceGateway.charge"],
+      ["runtime class", "runtime dependency", "classpath"],
+      ["method signature", "method definition"]
+    ],
+    "must_not_contain": ["ClassNotFoundException"]
+  }
+]

@@ -1,0 +1,7 @@
+# Runtime dependency versions resolved for errdoc-cli 0.1.0.
+# Refresh this lock when runtime dependencies change; Dependabot tracks this file.
+click==8.5.0
+rich==15.0.0
+markdown-it-py==4.2.0
+pygments==2.21.0
+mdurl==0.1.2
