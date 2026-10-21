@@ -48,7 +48,7 @@ def test_container_denies_root_filesystem_writes_and_external_network(tmp_path):
         timeout=120,
     )
     read_only_result = execute(
-        "python -c \"from pathlib import Path; Path('/var/tmp/errdoc-root-write-check').write_text('x')\"",
+        "python -c \"from pathlib import Path; Path('/etc/errdoc-root-write-check').write_text('x')\"",
         project_dir=tmp_path,
         timeout=120,
     )
