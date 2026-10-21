@@ -81,16 +81,16 @@ This document records the release requirements for a trustworthy public beta. A 
 
 ### 5. Packaging, Documentation, and Security
 
-Artifact freshness note (October 16, 2026): a wheel and sdist were rebuilt with an isolated environment (setuptools 84.0.0, wheel 0.48.0), installed and checked in clean Python 3.14/3.11 environments, and scanned. Those checks passed for that snapshot. Later evaluator, prompt, executor, tests, and documentation changes mean the existing `dist` files are stale; rebuild and recheck after this review and again from a reviewed release commit. There is no commit or remote yet.
+Artifact freshness note (October 21, 2026): historical `dist` files are stale. The current version 0.1.0 wheel and sdist were rebuilt from the reviewed commit in `.errdoc/release-candidate-dist-v11/`, checked, clean-installed, and scanned. They remain review candidates and have not been uploaded.
 
 - [x] MIT license file added.
 - [ ] Verify package name availability and ownership on PyPI before a release.
 - [ ] A read-only request to `https://pypi.org/pypi/errdoc-cli/json` returned HTTP 404 on October 16, 2026, so no project was listed under this name at that time. This does not guarantee that the name is claimable or reserved for this project; recheck and confirm eligibility immediately before TestPyPI or production publication.
 - [x] Rechecked the PyPI and TestPyPI JSON endpoints on October 21, 2026; both returned HTTP 404 for `errdoc-cli`. This confirms no public project record was returned at that time, not that PyPI has authorized this maintainer to claim the normalized name.
-- [x] Set package author and maintainer metadata to `Mhdjamadi1994` and added relevant keywords. Canonical repository/Issues/Documentation URLs still require the owner's confirmed repository address.
-- [x] Built and verified a working-tree wheel and sdist on October 16, 2026 before the latest code changes (`errdoc_cli-0.1.0-py3-none-any.whl`, `errdoc_cli-0.1.0.tar.gz`). That snapshot had 15 wheel files and 47 sdist files. Fresh Python 3.14.5 and 3.11.9 virtual environments installed the wheel and sdist with dependencies; `pip check`, installed-package import, `errdoc --version`, and `fix --version` passed. A targeted scan found no project-local directories, workspace/user1 machine paths, or known credential markers. The sdist deliberately includes synthetic credential strings in regression tests. Rebuild and repeat these checks for the latest code before release.
-- [x] Verify from-scratch installation and review the previous October 16 wheel/sdist snapshot.
-- [ ] Rebuild, install, byte-compare, scan, and audit package artifacts from the latest reviewed code and from a commit-addressed release revision.
+- [x] Set package author and maintainer metadata to `Mhdjamadi1994` and confirmed canonical repository, Issues, and Security URLs for `https://github.com/Mhdjamadi1994/errdoc-cli`.
+- [x] Rebuilt the current wheel and sdist from commit `ae3aabc` using isolated build environments. `twine check --strict` passed; separate clean Python 3.14 installs passed `pip check`, `errdoc --version`, and `fix --version`. The sdist includes the score-only human review CSV and excludes local raw reports. Heuristic scan matches are synthetic private-key examples in regression tests, not real credentials; scan limitations remain.
+- [x] Verify from-scratch installation and review both current artifacts independently.
+- [ ] Independently review human privacy of all fixtures and the exact release contents before publishing.
 - [x] Audited the artifact's five pinned runtime dependencies with pip-audit on October 16, 2026 in a fresh Python 3.11 environment; no known vulnerabilities were reported. CI repeats the audit from a separate target directory so it excludes pip/setuptools bootstrap packages and errdoc-cli itself, which is not published on PyPI.
 - [x] Provide Windows, macOS, and Linux development install instructions and an end-to-end local Ollama example.
 - [x] Document local and remote LLM data flow, configuration, known limitations, and safe-use boundaries.
@@ -100,15 +100,16 @@ Artifact freshness note (October 16, 2026): a wheel and sdist were rebuilt with 
 
 ### 6. Release and Public CI Evidence
 
-- [x] Staged 40 intended public project files in the local Git index and reviewed the staged file list and targeted secret-pattern scan. On October 16, 2026, `git diff --cached --check` was clean and the working tree matched the index. Local evaluation reports, virtual environments, and distribution artifacts are excluded. The repository has no commits and no remote; comprehensive privacy review remains a separate open gate.
-- [ ] Configure the public GitHub repository errdoc-cli and protect the release workflow.
-- [x] Configure weekly Dependabot updates for Python and GitHub Actions; regression coverage verifies both update ecosystems.
+- [x] Published 46 intended source, tests, workflow, and documentation files to the public GitHub repository. Local evaluation reports, virtual environments, and distribution artifacts are excluded. Comprehensive human privacy review remains open.
+- [ ] Protect the GitHub release workflow and configure branch/tag protections.
+- [x] Configure weekly Dependabot updates for Python and GitHub Actions and enable automated Dependabot security updates; regression coverage verifies both update ecosystems.
 - [x] Add regression checks that the workflow declares 3 operating systems x 5 Python versions, read-only contents permission, explicit integration selection, installs/smoke-tests both wheel and source distribution, and includes a runtime dependency audit job.
 - [x] Pin every third-party GitHub Action to a full commit SHA; the current checkout/setup-python refs were resolved from their upstream tags and have a regression check against mutable version tags.
 - [x] Add a non-publishing release-build workflow that tests, builds, checks metadata, and stores reviewable artifacts with read-only repository permissions. It has no PyPI upload step and no OIDC token permission.
-- [ ] Configure protected `main` and `v*` tags, required CI status checks, and required reviewers for a dedicated `pypi` environment.
-- [ ] Configure a TestPyPI Trusted Publisher and run the build-only workflow, inspect its exact artifact, then approve a separate TestPyPI upload. No `.pypirc` or PyPI credentials are present locally, and this checkout has no GitHub remote.
+- [ ] Configure protected `main` and `v*` tags, required CI status checks, and required reviewers for a dedicated `pypi` environment. An automatic approval review rejected the attempted protection API change because the bypass role was not verified; no alternate route was used.
+- [ ] Configure a TestPyPI Trusted Publisher and run the build-only workflow, inspect its exact artifact, then approve a separate TestPyPI upload. No `.pypirc` or PyPI credentials are present locally.
 - [x] Enable GitHub private vulnerability reporting on October 21, 2026; SECURITY.md points to its private intake route.
+- [x] Verify GitHub secret scanning, push protection, and Dependabot security updates are enabled; repository workflow token defaults to read-only and workflows request only read permissions.
 - [ ] Retain a fully settled successful GitHub Actions run for the latest commit; the October 21 run concluded success and its Podman sandbox job succeeded, while GitHub's Windows Python 3.12 job status remains in progress.
 - [ ] Publish a GitHub prerelease tag only after all quality gates pass.
 - [ ] Publish to TestPyPI, install and smoke-test it from a clean environment, then review the public release contents.
@@ -126,7 +127,7 @@ The project remains a pre-release development build. The public repository is `M
 - Windows Python 3.14.5 and 3.11.9: 322 passed each, 3 integration tests deselected after the image-ID regression test was added.
 - Linux Python 3.11 container: 321 passed, 3 deselected, with project/dependencies mounted read-only, networking disabled, and temporary storage isolated. This is not native Linux CI.
 - Windows Docker sandbox integration: 3 passed. Podman 6.1.4 is installed and an isolated Hyper-V machine was initialized using the digest-verified image and `volumes=[]`; starting it requires a fresh Windows logon or administrator session.
-- v10 wheel and source distribution passed `twine check --strict`; each artifact installed in a fresh Python 3.14 environment, `pip check` passed, and both `errdoc --version` and `fix --version` returned 0. The sdist contains the 50-row score-only CSV and excludes private raw review reports.
+- The current wheel and source distribution passed `twine check --strict`; each artifact installed in a fresh Python 3.14 environment, `pip check` passed, and both `errdoc --version` and `fix --version` returned 0. The sdist contains the 50-row score-only CSV and excludes private raw review reports.
 - `twine check --strict` passed for both v4 artifacts. Each installed from its local file in a separate fresh Python 3.14 environment; `pip check`, `errdoc --version`, and `fix --version` passed for both.
 - `git diff --check` passed. A targeted scan of text members inside both artifacts found no workspace/user profile paths or common token-pattern matches; this scan is heuristic and is not a guarantee that an artifact contains no sensitive information.
 - The release candidate is not approved for package publication: the current LLM answer set has 0 human scores; branch/tag protection and TestPyPI upload/install verification remain open. GitHub's automatic approval review rejected the requested protection-settings API operation because its hard-coded bypass role was unverified; the operation was not retried through another route. The source is public on GitHub. No PyPI/TestPyPI package upload occurred.
