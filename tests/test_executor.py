@@ -57,7 +57,8 @@ def test_split_command_respects_quoted_arguments(command, expected):
         assert executor.split_command(command) == expected
 
 
-def test_command_runs_in_restricted_container_with_disposable_snapshot(tmp_path, monkeypatch):
+@pytest.mark.parametrize("image_id", ["sha256:" + "a" * 64, "a" * 64])
+def test_command_runs_in_restricted_container_with_disposable_snapshot(tmp_path, monkeypatch, image_id):
     import io
     import tarfile
 
@@ -71,7 +72,7 @@ def test_command_runs_in_restricted_container_with_disposable_snapshot(tmp_path,
     def fake_run(command, **kwargs):
         calls.append((command, kwargs))
         if command[1:3] == ["image", "inspect"]:
-            return SimpleNamespace(returncode=0, stdout="sha256:" + "a" * 64 + "\n", stderr="")
+            return SimpleNamespace(returncode=0, stdout=image_id + "\n", stderr="")
         if command[1] == "run":
             cidfile = command[command.index("--cidfile") + 1]
             with open(cidfile, "w", encoding="ascii") as handle:

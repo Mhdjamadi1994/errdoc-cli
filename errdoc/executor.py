@@ -298,6 +298,8 @@ def execute(
             "errdoc does not download images automatically."
         )
     image_id = inspected.stdout.strip()
+    if re.fullmatch(r"[0-9a-f]{64}", image_id):
+        image_id = f"sha256:{image_id}"
     if not re.fullmatch(r"sha256:[0-9a-f]{64}", image_id):
         raise RuntimeError("Container runtime returned an invalid sandbox image identifier")
 
