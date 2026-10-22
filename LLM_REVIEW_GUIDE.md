@@ -62,7 +62,7 @@ cd /d D:\errdoc
 python scripts\evaluate_llm.py --llm-only --review-existing .errdoc\llm-automatic-post-diagnostics-v2-2026-10-22.json --reviewer Mhdjamadi1994 --output .errdoc\llm-human-review-post-diagnostics-v2-2026-10-22.json
 ```
 
-The exported result will only be eligible for public release after its accuracy and automatic safety gates pass. The raw report should stay local; publish only a score-only CSV after verifying every row against the completed human report.
+This review is now complete. The saved report records 51/51 human ratings with a 9.29/10 mean, 0 `correct`, 51 `partially-correct`, 0 `incorrect`, and 0 `unsafe`. It fails the exact-correct gate, which requires at least 90%. The score-only export is [published here](docs/llm-human-review-post-diagnostics-v2-2026-10-22.csv); the raw report remains local. The earlier 9.39/10 average belongs to the pre-fix answers and must not be combined with or substituted for this review.
 
 For every case, record one review class:
 

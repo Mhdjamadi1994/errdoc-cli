@@ -1,8 +1,8 @@
 # errdoc
 
-**A command fails. errdoc helps you understand why.**
+**Turn failed commands into clearer next steps.**
 
-errdoc runs a command you choose, collects its error output, and explains it in plain language. It can use a local Ollama model or an OpenAI-compatible service. It never runs commands suggested by a model.
+errdoc runs a command you choose, captures its error output, and explains the likely cause in plain language. Use built-in rules or connect a local Ollama model or an OpenAI-compatible service. errdoc never executes commands suggested by a model.
 
 <p>
   <a href="#quick-start">🚀 Quick start</a> ·
@@ -15,8 +15,6 @@ errdoc runs a command you choose, collects its error output, and explains it in 
 [![CI](https://github.com/Mhdjamadi1994/errdoc-cli/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/Mhdjamadi1994/errdoc-cli/actions/workflows/tests.yml) · Python 3.10+ · [MIT license](LICENSE) · [Private vulnerability reporting](SECURITY.md)
 
 > **Project status: pre-release.** The source code is public on GitHub, but the package has not been published to PyPI. AI explanations can be wrong. Read the privacy and safety notes below before using real logs or the optional fix runner.
-
-**Trust and evaluation:** The updated code is provisionally rated 7/10. Its latest 51-answer automatic review had no flagged unsafe or unsupported output, but those answers still need human scoring; the older 9.39/10 human average belongs to a different version and does not prove this one is reliable. See the [full trust assessment](docs/trust-assessment-2026-10-22.md), [human review steps](LLM_REVIEW_GUIDE.md), and [quality gates](QUALITY_GATES.md).
 
 ## How it works
 
@@ -212,11 +210,15 @@ You must already have a working Docker or Podman runtime and a local image. The 
 
 ## Help and project status
 
-errdoc is an early pre-release project. It is not a debugger and cannot promise a correct explanation for every error. The October 22 baseline review scored 51 model answers at 9.39/10 on average, but only 1 was labeled fully correct; the other 50 were partially correct. We have since added deterministic diagnoses for several concrete failure modes and expanded the test corpus. Those changes need a fresh model evaluation and human review, so the baseline score is not a score for the updated code. See the [trust assessment](docs/trust-assessment-2026-10-22.md) and [quality gates](QUALITY_GATES.md) for evidence and release blockers.
+errdoc is an early pre-release project, not a debugger. Its explanations are suggestions to check against the original error and the tool's documentation.
 
-### Why isn't it rated 10/10 yet?
+### Current evaluation
 
-Passing tests shows that errdoc works in the tested situations. It does not prove that every AI explanation is correct or that every secret will be found. The pre-fix baseline's human review and automatic flags remain useful historical evidence, but they do not validate the updated diagnostic routes. TestPyPI installation, PyPI name ownership, and a broader privacy review also remain unverified. The [trust assessment](docs/trust-assessment-2026-10-22.md) separates baseline results from the updated build; automatic checks look for patterns and cannot prove meaning.
+On October 22, 2026, the owner reviewed 51 answers from the updated `llama3.2` evaluation. The mean score across accuracy, specificity, safety, and concision was **9.29/10**. The separate correctness labels were **0 correct, 51 partially correct, 0 incorrect, and 0 unsafe**. No answer was labeled fully correct, so the 90% correctness gate is **not met**. The 9.29 average is not an accuracy rate. Automatic checks also found no unsafe or command suggestions, generic-advice flags, unsupported-claim flags, or overlong answers; those checks do not replace human correctness review.
+
+See the [score-only results for this version](docs/llm-human-review-post-diagnostics-v2-2026-10-22.csv), the [older baseline results](docs/llm-human-review-2026-10-22.csv), the [trust assessment](docs/trust-assessment-2026-10-22.md), [review instructions](LLM_REVIEW_GUIDE.md), and [release gates](QUALITY_GATES.md).
+
+The package is not yet published to PyPI. TestPyPI publishing, project-name ownership, and remaining privacy/release checks still need verification.
 
 - [**Review the tests and release gates →**](QUALITY_GATES.md)
 - [**Report a security issue privately →**](SECURITY.md)
