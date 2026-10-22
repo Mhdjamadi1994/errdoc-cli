@@ -39,16 +39,22 @@ def test_github_actions_are_pinned_to_full_commit_shas():
     assert all(re.fullmatch(r"[0-9a-f]{40}", ref) for ref in uses_refs)
 
 
-def test_release_artifact_workflow_has_no_publish_permissions_or_publish_action():
+def test_release_workflow_only_publishes_to_testpypi_after_manual_confirmation():
     workflow = Path(__file__).parents[1] / ".github" / "workflows" / "build-release.yml"
     content = workflow.read_text(encoding="utf-8")
+    build_job, publish_job = content.split("  publish-testpypi:", 1)
     assert '"v*"' in content
     assert "workflow_dispatch:" in content
-    assert "contents: read" in content
-    assert "twine check --strict" in content
-    assert "id-token" not in content
-    assert "pypa/gh-action-pypi-publish" not in content
-    assert "repository-url:" not in content
+    assert 'publish_to_testpypi:' in content
+    assert "default: false" in content
+    assert "twine check --strict" in build_job
+    assert "id-token" not in build_job
+    assert "pypa/gh-action-pypi-publish" not in build_job
+    assert "if: github.event_name == 'workflow_dispatch' && inputs.publish_to_testpypi" in publish_job
+    assert "id-token: write" in publish_job
+    assert "environment:\n      name: testpypi" in publish_job
+    assert "repository-url: https://test.pypi.org/legacy/" in publish_job
+    assert "https://upload.pypi.org/legacy/" not in publish_job
 
 
 def test_public_bug_report_template_warns_against_sensitive_data():

@@ -210,11 +210,11 @@ You must already have a working Docker or Podman runtime and a local image. The 
 
 ## Help and project status
 
-errdoc is an early pre-release project. It is not a debugger and cannot promise a correct explanation for every error. The current prompt's 50 model-backed cases have an automatic evaluation, but they do not yet have current human ratings. Earlier human ratings belong to an older prompt and are not evidence for today's answers. See [QUALITY_GATES.md](QUALITY_GATES.md) for test results and release blockers.
+errdoc is an early pre-release project. It is not a debugger and cannot promise a correct explanation for every error. The current prompt's 51 model-backed cases have a fresh automatic evaluation, but they do not yet have current human ratings. Earlier human ratings belong to an older prompt and are not evidence for today's answers. See [QUALITY_GATES.md](QUALITY_GATES.md) for test results and release blockers.
 
 ### Why isn't it rated 10/10 yet?
 
-Passing tests shows that errdoc works in the tested situations. It does not prove that every AI explanation is correct or that every secret will be found. The 50 answers from the current model prompt still need human review; the automatic score checks words and patterns, not meaning. TestPyPI installation, PyPI name ownership, and a broader privacy review also remain unverified. Until those checks are complete, a perfect trust score would overstate the evidence.
+Passing tests shows that errdoc works in the tested situations. It does not prove that every AI explanation is correct or that every secret will be found. The 51 answers from the current model prompt still need human review; the automatic score checks words and patterns, not meaning. TestPyPI installation, PyPI name ownership, and a broader privacy review also remain unverified. Until those checks are complete, a perfect trust score would overstate the evidence.
 
 - [**Review the tests and release gates →**](QUALITY_GATES.md)
 - [**Report a security issue privately →**](SECURITY.md)
