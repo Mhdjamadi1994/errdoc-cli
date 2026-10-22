@@ -215,7 +215,7 @@ To review diagnosis correctness by hand, use the interactive evaluation command 
 
 ## Release readiness
 
-This is an active pre-release build; the PyPI package is not published. The latest completed GitHub Actions run for `main` passed all 18 checks on October 21, 2026. Workspace changes made after that run still need hosted CI. See [QUALITY_GATES.md](QUALITY_GATES.md) for release criteria, evidence, and remaining work. Passing CI does not by itself establish diagnosis accuracy or complete release readiness.
+This is an active pre-release build; the PyPI package is not published. Commit `1f25922` passed all 18 GitHub Actions checks on October 22, 2026, including the platform/Python matrix, Docker, Podman, and dependency audit. See [QUALITY_GATES.md](QUALITY_GATES.md) for release criteria, evidence, and remaining work. Passing CI does not by itself establish diagnosis accuracy or complete release readiness.
 
 ## Current scope
 
@@ -223,4 +223,4 @@ Project detection covers Django, Node.js, Git, and Python markers. Shell history
 
 ## Continuous integration
 
-The configured GitHub Actions workflow tests Windows, Linux, and macOS on Python 3.10 through 3.14, builds and installs both wheel and source distributions, and runs Linux Docker/Podman sandbox checks. The latest completed `main` run passed all 18 checks on October 21, 2026; local candidate changes made afterward have not run in hosted CI. See the [Actions history](https://github.com/Mhdjamadi1994/errdoc-cli/actions/workflows/tests.yml) for live status.
+The configured GitHub Actions workflow tests Windows, Linux, and macOS on Python 3.10 through 3.14, builds and installs both wheel and source distributions, and runs Linux Docker/Podman sandbox checks. Run 39773246844 for commit `1f25922` passed all 18 checks on October 22, 2026. See the [Actions history](https://github.com/Mhdjamadi1994/errdoc-cli/actions/workflows/tests.yml) for live status.
