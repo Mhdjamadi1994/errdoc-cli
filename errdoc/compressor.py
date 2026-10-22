@@ -30,6 +30,7 @@ _IPV6_CANDIDATE = re.compile(
     r"(?<![0-9A-Fa-f:])(?:[0-9A-Fa-f]{0,4}:){2,7}[0-9A-Fa-f]{0,4}"
     r"(?:%[A-Za-z0-9_.-]+)?(?![0-9A-Fa-f:])"
 )
+_VERSION_VALUE_CONTEXT = re.compile(r"(?i)(?:\bversion|\bclass file version)\s*[=:]\s*$")
 _WINDOWS_USER_HOME = re.compile(r"(?i)\b[A-Z]:[\\/]+Users[\\/]+[^\\/\s:'\"]+")
 _UNIX_USER_HOME = re.compile(r"/(?:home|Users)/[^/\\\s:'\"]+")
 
@@ -53,6 +54,11 @@ def sanitize(text: str) -> str:
 
     def redact_ip(match: re.Match[str]) -> str:
         candidate = match.group(0).split("%", 1)[0]
+        # Four-part assembly versions look exactly like IPv4 literals. Preserve
+        # them only when explicitly labeled as versions so diagnostics retain
+        # useful metadata without broadly weakening address redaction.
+        if match.re is _IPV4_CANDIDATE and _VERSION_VALUE_CONTEXT.search(text[:match.start()]):
+            return match.group(0)
         try:
             ipaddress.ip_address(candidate)
         except ValueError:

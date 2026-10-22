@@ -23,6 +23,12 @@ SYSTEM_PROMPT += " For npm ETARGET, say that the configured registry did not ret
 SYSTEM_PROMPT += " Use plain prose only: do not use backticks, inline code, code fences, or any shell command, including as an example. Describe what setting or file to inspect without writing a command."
 SYSTEM_PROMPT += " For UnsupportedClassVersionError, preserve the logged class-file version numbers and state which version the runtime accepts; do not guess a compiler flag or project configuration file."
 SYSTEM_PROMPT += " Never suggest rerunning or retrying the failed command, including invoking a tool by itself again; give a distinct, evidence-based inspection step instead."
+SYSTEM_PROMPT += " For Python multiprocessing bootstrap errors under spawn, explain that process creation must be protected by the main-module guard; never invent python.ini or pyvenv.cfg settings."
+SYSTEM_PROMPT += " For Terraform Invalid for_each argument errors, explain that instance keys must be known during planning even when values may be unknown; do not invent a values file or state-lock issue. For Terraform 'Provider configuration not present', explain that state still references the missing provider configuration and advise restoring the exact provider alias to manage or remove the state objects, or migrating the state before removing that configuration; do not suggest registry settings."
+SYSTEM_PROMPT += " For Kubernetes ImagePullBackOff, say the status alone does not identify the cause. Inspect the pod event's exact pull error; distinguish authentication, missing image/tag/digest, and registry/network failures as possibilities only when supported. Kubernetes API logs are not the pod's image-pull error evidence."
+SYSTEM_PROMPT += " For Java NoSuchMethodError, explain runtime binary linkage incompatibility: the loaded class lacks the method expected by the caller. Focus on runtime classpath and dependency versions; do not blame Java version unless the error is UnsupportedClassVersionError."
+SYSTEM_PROMPT += " For HTTP 401, focus on authentication or authorization evidence; do not describe it as rate limiting. Distinguish 429 as the rate-limit status. For MySQL lock-wait timeout errors, distinguish a transaction timing out while waiting for a lock from a detected deadlock; do not call it a deadlock unless the error says deadlock."
+SYSTEM_PROMPT += " For npm EINTEGRITY, explain that received content did not match the expected integrity value. Do not treat this as a missing package version or recommend changing the lockfile to bypass the mismatch; advise checking the configured registry/proxy and expected package integrity."
 _MODULE_NOT_FOUND = re.compile(r"ModuleNotFoundError:\s+No module named ['\"]([^'\"]+)['\"]")
 _EXPLICIT_RAISE = re.compile(r"(?m)^\s*raise\s+([A-Z][A-Za-z0-9_]*(?:Error|Exception))(?=\s|\()")
 _TERMINAL_EXCEPTION = re.compile(r"(?m)^([A-Z][A-Za-z0-9_]*(?:Error|Exception)):\s*(.*)$")
@@ -62,6 +68,27 @@ _PYTEST_FIXTURE_MISSING = re.compile(r"fixture ['\x22]([^'\x22]+)['\x22] not fou
 _PG_CONNECTION_SLOTS = re.compile(r"remaining connection slots are reserved", re.I)
 _GO_MODULE_MISSING = re.compile(r"no required module provides package\s+([^;\s]+)", re.I)
 _K8S_IMAGE_PULL = re.compile(r"Failed to pull image\s+['\x22]([^'\x22]+)['\x22]", re.I)
+_K8S_IMAGE_PULL_BACKOFF = re.compile(r"ImagePullBackOff|Back-off pulling image", re.I)
+_PYTHON_MP_BOOTSTRAP = re.compile(
+    r"An attempt has been made to start a new process before the current process has finished its bootstrapping phase",
+    re.I,
+)
+_PYTHON_ZERO_DIVISION = re.compile(r"ZeroDivisionError:\s*division by zero", re.I)
+_PYTHON_DATETIME_UTC_MISSING = re.compile(
+    r"AttributeError:\s*module\s+['\x22]datetime['\x22]\s+has no attribute\s+['\x22]UTC['\x22].*?Python runtime:\s*3\.10(?:\.\d+)?\b",
+    re.I | re.S,
+)
+_TERRAFORM_FOR_EACH_UNKNOWN = re.compile(r"Invalid for_each argument.*?known only after apply", re.I | re.S)
+_TERRAFORM_PROVIDER_CONFIG_MISSING = re.compile(
+    r"Provider configuration not present.*?requires provider\s+([^,\s]+),\s*but it has been removed",
+    re.I | re.S,
+)
+_DOCKER_PORT_ALLOCATED = re.compile(r"Bind for (?:[^\s:]+:)?(\d{1,5}) failed: port is already allocated", re.I)
+_GO_CHECKSUM_MISMATCH = re.compile(r"checksum mismatch.*?\bgo\.sum:", re.I | re.S)
+_DOTNET_TYPELOAD_METHOD = re.compile(
+    r"System\.TypeLoadException:.*?Method\s+['\x22]([^'\x22]+)['\x22]\s+in type\s+['\x22]([^'\x22]+)['\x22].*?from assembly\s+['\x22]([^'\x22]+)['\x22].*?does not have an implementation",
+    re.I | re.S,
+)
 _MYSQL_ACCESS_DENIED = re.compile(r"Access denied for user\s+['\x22]([^'\x22]+)['\x22]@['\x22]([^'\x22]+)['\x22]", re.I)
 _SQL_UNIQUE_CONSTRAINT = re.compile(r"UNIQUE constraint failed:\s*([^\s\]\[]+)", re.I)
 _POWERSHELL_POLICY = re.compile(r"cannot be loaded because running scripts is disabled", re.I)
@@ -176,6 +203,106 @@ def _safe_provider_error(value: object, api_key: str | None) -> str:
 
 
 def _known_diagnosis(error: str) -> str | None:
+    if _PYTHON_DATETIME_UTC_MISSING.search(error):
+        return (
+            "**Diagnosis**\n"
+            "The standard-library `datetime` module in Python 3.10 does not provide `datetime.UTC`; that constant was added in Python 3.11. The error is consistent with code that uses an API newer than the reported runtime.\n\n"
+            "**Steps**\n\n"
+            "1. Use `datetime.timezone.utc` when supporting Python 3.10, or require Python 3.11 or newer if the project needs `datetime.UTC`.\n"
+            "2. Check the project's declared Python minimum against the runtime used to launch it."
+        )
+
+    dotnet_method = _DOTNET_TYPELOAD_METHOD.search(error)
+    if dotnet_method:
+        method, type_name, assembly = dotnet_method.groups()
+        return (
+            "**Diagnosis**\n"
+            f"The .NET runtime reports that method {method} on type {type_name} in assembly {assembly} has no implementation. This points to a type or assembly build/deployment mismatch; the log does not identify which build output is wrong.\n\n"
+            "**Steps**\n\n"
+            "1. Check the method signature and implementation in the assembly produced by the intended build.\n"
+            "2. Verify that the deployed assembly is from the matching build and that stale copies are not loaded."
+        )
+
+    zero_division = _PYTHON_ZERO_DIVISION.search(error)
+    if zero_division:
+        location = re.search(r"\b([\w./\\-]+\.py:\d+)\b", error)
+        location_detail = f" at {location.group(1)}" if location else ""
+        return (
+            "**Diagnosis**\n"
+            f"Python raised ZeroDivisionError because an operation divided by zero{location_detail}. The log identifies the failure location but not why the denominator became zero.\n\n"
+            "**Steps**\n\n"
+            "1. Inspect the division at the reported location and trace how its denominator is calculated.\n"
+            "2. Decide how the application should handle a zero denominator before performing the operation."
+        )
+
+    go_checksum = _GO_CHECKSUM_MISMATCH.search(error)
+    if go_checksum:
+        module = re.search(r"verifying\s+([^\s@]+)(?:@([^:\s]+))?", error, re.I)
+        module_detail = (
+            f" for module {module.group(1)}{('@' + module.group(2)) if module.group(2) else ''}"
+            if module else ""
+        )
+        return (
+            "**Diagnosis**\n"
+            f"Go detected a checksum mismatch{module_detail}: the downloaded content's checksum differs from the value recorded in go.sum. This protects module integrity; the log does not establish which value is correct.\n\n"
+            "**Steps**\n\n"
+            "1. Verify the module version and source, and check whether the configured proxy or source changed the downloaded content.\n"
+            "2. Preserve checksum verification and resolve the mismatch using the trusted source for that module."
+        )
+
+    if _PYTHON_MP_BOOTSTRAP.search(error):
+        return (
+            "**Diagnosis**\n"
+            "This RuntimeError says Python multiprocessing tried to start a new process before the bootstrapping phase finished. With the spawn startup method, the main module is imported again in the child process.\n\n"
+            "**Steps**\n\n"
+            "1. Put process creation and the code that launches workers behind the `if __name__ == \"__main__\":` guard.\n"
+            "2. Keep worker functions at module scope so the spawned process can import them."
+        )
+
+    if _TERRAFORM_FOR_EACH_UNKNOWN.search(error):
+        return (
+            "**Diagnosis**\n"
+            "Terraform cannot determine the keys for `for_each` during planning because the expression depends on values that are only known after apply. The instance keys must be known during planning, though values associated with those keys may remain unknown.\n\n"
+            "**Steps**\n\n"
+            "1. Check which resource attributes feed `local.service_accounts` and use stable keys known before apply.\n"
+            "2. If the resources must be created in stages, review the dependency design and plan the stages explicitly."
+        )
+
+    missing_provider = _TERRAFORM_PROVIDER_CONFIG_MISSING.search(error)
+    if missing_provider:
+        provider = missing_provider.group(1)
+        module = re.search(r"\b(module\.[\w.-]+)\s+requires provider", error, re.I)
+        module_detail = f" for {module.group(1)}" if module else ""
+        return (
+            "**Diagnosis**\n"
+            f"Terraform state still references provider configuration {provider}{module_detail}, but that configuration has been removed from the current configuration. The provider alias is missing from the configuration Terraform currently uses; the state still has objects associated with that configuration.\n\n"
+            "**Steps**\n\n"
+            "1. Restore the exact provider alias so Terraform can manage or remove the state objects that use it.\n"
+            "2. Remove the configuration only after those objects are removed or the state is migrated."
+        )
+
+    if _K8S_IMAGE_PULL_BACKOFF.search(error):
+        image = re.search(r"(?:pulling image|image)\s+([^\s,]+)", error, re.I)
+        image_detail = f" for image {image.group(1)}" if image else ""
+        return (
+            "**Diagnosis**\n"
+            f"Kubernetes is backing off while pulling the container image{image_detail}. `ImagePullBackOff` alone does not identify the cause.\n\n"
+            "**Steps**\n\n"
+            "1. Inspect the pod event's exact pull error to distinguish an image or tag problem, missing registry credentials, and registry or network access.\n"
+            "2. Verify the image reference and the workload's image-pull credentials against that evidence."
+        )
+
+    docker_port = _DOCKER_PORT_ALLOCATED.search(error)
+    if docker_port:
+        port = docker_port.group(1)
+        return (
+            "**Diagnosis**\n"
+            f"Docker could not bind host port {port} because that port is already allocated. The message does not identify which process or container owns it.\n\n"
+            "**Steps**\n\n"
+            "1. Review active container port mappings and the host's listening sockets to identify the owner.\n"
+            "2. Choose a free host port or stop the owning service only after confirming it is safe to do so."
+        )
+
     java_version = _JAVA_CLASS_VERSION.search(error)
     if java_version:
         compiled_version, runtime_maximum = java_version.groups()

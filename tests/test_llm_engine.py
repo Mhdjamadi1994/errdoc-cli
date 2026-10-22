@@ -8,7 +8,76 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import pytest
 
 from errdoc.config import Config
-from errdoc.llm_engine import diagnose, needs_llm, sanitize_model_response
+from errdoc.llm_engine import SYSTEM_PROMPT, diagnose, needs_llm, sanitize_model_response
+
+
+def test_system_prompt_covers_reviewed_failure_modes_without_unsupported_fixes():
+    assert "main-module guard" in SYSTEM_PROMPT
+    assert "instance keys must be known during planning" in SYSTEM_PROMPT
+    assert "state still references the missing provider configuration" in SYSTEM_PROMPT
+    assert "status alone does not identify the cause" in SYSTEM_PROMPT
+    assert "do not blame Java version unless the error is UnsupportedClassVersionError" in SYSTEM_PROMPT
+    assert "do not describe it as rate limiting" in SYSTEM_PROMPT
+    assert "distinguish a transaction timing out while waiting for a lock from a detected deadlock" in SYSTEM_PROMPT
+    assert "Do not treat this as a missing package version" in SYSTEM_PROMPT
+
+
+@pytest.mark.parametrize(
+    ("error", "expected", "forbidden"),
+    [
+        (
+            "ZeroDivisionError: division by zero in billing.py:74",
+            "denominator",
+            "line 74 is not verified",
+        ),
+        (
+            "verifying example.com/ledger@v1.8.2: checksum mismatch\ndownloaded: h1:aaaa\ngo.sum: h1:bbbb",
+            "differs from the value recorded in go.sum",
+            "go mod verify",
+        ),
+        (
+            "RuntimeError: An attempt has been made to start a new process before the current process has finished its bootstrapping phase.",
+            "__main__",
+            "python.ini",
+        ),
+        (
+            "Error: Invalid for_each argument\nfor_each = local.service_accounts depends on values known only after apply.",
+            "keys must be known during planning",
+            "values variable",
+        ),
+        (
+            "Error: Provider configuration not present\nmodule.storage requires provider registry.terraform.io/hashicorp/aws.west, but it has been removed.",
+            "state still references provider configuration",
+            "removed from the state",
+        ),
+        (
+            "Pod api-5f94 State Waiting Reason ImagePullBackOff\nBack-off pulling image registry.example.invalid/team/api:v7",
+            "does not identify the cause",
+            "failure in the registry",
+        ),
+        (
+            "Error response from daemon: Bind for 0.0.0.0:8080 failed: port is already allocated",
+            "host port 8080",
+            "netstat",
+        ),
+        (
+            "System.TypeLoadException: Method 'GetInvoiceTotal' in type 'Contoso.Billing.InvoiceService' from assembly 'Contoso.Billing, Version=4.1.0.0' does not have an implementation.",
+            "has no implementation",
+            "runtime classpath",
+        ),
+        (
+            "AttributeError: module 'datetime' has no attribute 'UTC'\nPython runtime: 3.10.14",
+            "added in Python 3.11",
+            "introduced in Python 3.7",
+        ),
+    ],
+)
+def test_reviewed_failure_modes_use_deterministic_evidence_based_diagnosis(error, expected, forbidden):
+    result = diagnose(error, {}, Config(provider="ollama", model="unused", base_url="http://127.0.0.1:1"))
+
+    assert expected.casefold() in result.casefold()
+    assert forbidden.casefold() not in result.casefold()
+    assert needs_llm(error) is False
 
 
 @contextmanager

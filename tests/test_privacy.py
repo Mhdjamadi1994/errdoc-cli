@@ -44,3 +44,11 @@ def test_home_directory_redaction_is_case_insensitive_for_windows_paths():
     result = sanitize(r"C:\Users\Alice\Projects\private\app.py")
     assert "Alice" not in result
     assert "[HOME]" in result
+
+
+def test_version_labeled_four_part_number_is_preserved_while_ipv4_is_redacted():
+    result = sanitize("Assembly Version=4.1.0.0; connected to 203.0.113.25")
+
+    assert "Version=4.1.0.0" in result
+    assert "203.0.113.25" not in result
+    assert "<IP_REDACTED>" in result

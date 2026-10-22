@@ -577,6 +577,7 @@
       ],
       [
         "main guard",
+        "__main__",
         "spawn"
       ]
     ]
@@ -1236,5 +1237,105 @@
       ["method signature", "method definition"]
     ],
     "must_not_contain": ["ClassNotFoundException"]
+  },
+  {
+    "id": "extended_ruby_bundle_platform_mismatch",
+    "project": "Ruby",
+    "error": "Bundler::GemNotFound: Could not find gem 'ffi (>= 1.15)' with platform 'x86_64-linux' in installed gems",
+    "fact_groups": [
+      ["Bundler::GemNotFound", "Could not find gem"],
+      ["ffi", "1.15"],
+      ["x86_64-linux", "platform"],
+      ["installed gems", "lockfile", "platform-specific package"]
+    ]
+  },
+  {
+    "id": "extended_php_composer_class_missing",
+    "project": "PHP",
+    "error": "PHP Fatal error: Uncaught Error: Class \"App\\\\Reports\\\\PdfRenderer\" not found in /srv/app/src/Reports/ExportController.php:42",
+    "fact_groups": [
+      ["Class", "not found"],
+      ["App\\\\Reports\\\\PdfRenderer"],
+      ["ExportController.php:42"],
+      ["autoload", "namespace", "composer"]
+    ]
+  },
+  {
+    "id": "extended_redis_max_clients",
+    "project": "Redis",
+    "error": "redis.exceptions.ResponseError: max number of clients reached",
+    "fact_groups": [
+      ["max number of clients reached", "maxclients"],
+      ["Redis", "redis.exceptions.ResponseError"],
+      ["client connections", "connection pool", "idle clients"],
+      ["server limit", "connection growth"]
+    ]
+  },
+  {
+    "id": "extended_sqlalchemy_missing_greenlet",
+    "project": "Python/SQLAlchemy",
+    "error": "sqlalchemy.exc.MissingGreenlet: greenlet_spawn has not been called; can't call await_only() here. Was IO attempted in an unexpected place?",
+    "fact_groups": [
+      ["MissingGreenlet", "greenlet_spawn has not been called"],
+      ["await_only", "IO attempted in an unexpected place"],
+      ["async", "synchronous context", "greenlet context"],
+      ["lazy loading", "awaitable", "async session"]
+    ]
+  },
+  {
+    "id": "extended_rust_mutable_immutable_borrow",
+    "project": "Rust",
+    "error": "error[E0502]: cannot borrow `items` as mutable because it is also borrowed as immutable\n  --> src/selection.rs:28:5\n27 | let first = &items[0];\n28 | items.push(value);\n29 | println!(\"{first}\");",
+    "fact_groups": [
+      ["E0502", "cannot borrow"],
+      ["mutable", "as mutable"],
+      ["borrowed as immutable", "immutable"],
+      ["src/selection.rs:28", "items.push"],
+      ["borrow lifetime", "end the immutable borrow", "restructure the access"]
+    ]
+  },
+  {
+    "id": "extended_cmake_generator_platform_mismatch",
+    "project": "CMake",
+    "error": "CMake Error: Generator Unix Makefiles does not support platform specification, but platform x64 was specified.",
+    "fact_groups": [
+      ["Generator Unix Makefiles", "Unix Makefiles"],
+      ["does not support platform specification"],
+      ["platform x64 was specified", "x64"],
+      ["generator selection", "build configuration", "CMake cache"]
+    ]
+  },
+  {
+    "id": "extended_dotnet_typeload_missing_member",
+    "project": "C#/.NET",
+    "error": "System.TypeLoadException: Method 'GetInvoiceTotal' in type 'Contoso.Billing.InvoiceService' from assembly 'Contoso.Billing, Version=4.1.0.0' does not have an implementation.",
+    "fact_groups": [
+      ["TypeLoadException"],
+      ["GetInvoiceTotal"],
+      ["Contoso.Billing.InvoiceService", "Contoso.Billing"],
+      ["does not have an implementation", "runtime assembly", "build output"]
+    ]
+  },
+  {
+    "id": "extended_python_datetime_utc_missing",
+    "project": "Python",
+    "error": "AttributeError: module 'datetime' has no attribute 'UTC'\nPython runtime: 3.10.14",
+    "fact_groups": [
+      ["AttributeError", "has no attribute"],
+      ["datetime", "UTC"],
+      ["3.10.14", "Python 3.10"],
+      ["added in Python 3.11", "timezone.utc", "runtime compatibility"]
+    ]
+  },
+  {
+    "id": "extended_node_export_subpath_denied",
+    "project": "Node.js",
+    "error": "Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './internal.js' is not defined by \"exports\" in /srv/app/node_modules/telemetry-kit/package.json imported from /srv/app/src/metrics.js",
+    "fact_groups": [
+      ["ERR_PACKAGE_PATH_NOT_EXPORTED", "not defined by exports"],
+      ["./internal.js"],
+      ["telemetry-kit/package.json", "telemetry-kit"],
+      ["public export", "supported entry point", "package exports map"]
+    ]
   }
 ]
