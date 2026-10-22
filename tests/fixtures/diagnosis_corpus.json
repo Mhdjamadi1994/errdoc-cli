@@ -1606,5 +1606,47 @@
     "error": "Could not resolve project :billing. No matching variant of project :billing was found. The consumer needed a runtime library for Java 21, but the producer declares a Java 17 target.",
     "fact_groups": [["No matching variant", "Could not resolve project"], ["Java 21", "Java 17"], ["consumer", "producer", "variant attributes"]],
     "must_not_contain": ["delete Gradle cache", "change Java source level blindly"]
+  },
+  {
+    "id": "extended_python_index_error",
+    "project": "Python",
+    "error": "IndexError: list index out of range\n at csv_reader.py:84 in read_invoice",
+    "fact_groups": [["IndexError", "index out of range"], ["list", "sequence"], ["csv_reader.py:84", "empty input", "bounds check"]],
+    "must_not_contain": ["increase the recursion limit", "change the index blindly"]
+  },
+  {
+    "id": "extended_terraform_dependency_cycle",
+    "project": "Terraform",
+    "error": "Error: Cycle: aws_security_group.api, aws_security_group.database, aws_security_group.api",
+    "fact_groups": [["Cycle", "dependency cycle"], ["aws_security_group.api", "aws_security_group.database"], ["mutual dependency", "dependency graph", "break the cycle"]],
+    "must_not_contain": ["delete the state file", "force-unlock"]
+  },
+  {
+    "id": "extended_php_parse_error",
+    "project": "PHP",
+    "error": "PHP Parse error: syntax error, unexpected token \"=>\" in /srv/app/src/InvoiceMap.php on line 37",
+    "fact_groups": [["Parse error", "syntax error"], ["unexpected token", "=>"], ["InvoiceMap.php", "line 37", "surrounding syntax"]],
+    "must_not_contain": ["reinstall PHP", "disable parser checks"]
+  },
+  {
+    "id": "extended_rust_return_local_reference",
+    "project": "Rust",
+    "error": "error[E0515]: cannot return reference to local variable `summary`\n --> src/report.rs:26:5",
+    "fact_groups": [["E0515", "cannot return reference"], ["local variable", "summary"], ["src/report.rs:26", "owned value", "return a reference"]],
+    "must_not_contain": ["use unsafe", "data race"]
+  },
+  {
+    "id": "extended_http_400_invalid_field",
+    "project": "HTTP/API",
+    "error": "HTTPError: 400 Bad Request\nPOST https://api.example.invalid/v2/invoices\nResponse: invalid field 'currency_code'",
+    "fact_groups": [["400", "Bad Request"], ["api.example.invalid/v2/invoices"], ["currency_code", "invalid field", "request schema"]],
+    "must_not_contain": ["disable request validation", "retry the same payload unchanged"]
+  },
+  {
+    "id": "extended_postgres_transaction_aborted",
+    "project": "PostgreSQL",
+    "error": "psycopg.errors.InFailedSqlTransaction: current transaction is aborted, commands ignored until end of transaction block\nSQLSTATE: 25P02",
+    "fact_groups": [["InFailedSqlTransaction", "transaction is aborted"], ["25P02", "commands ignored"], ["earlier statement", "rollback", "transaction boundary"]],
+    "must_not_contain": ["deadlock detected", "commit the failed transaction"]
   }
 ]

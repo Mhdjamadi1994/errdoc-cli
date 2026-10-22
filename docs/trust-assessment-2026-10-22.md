@@ -2,19 +2,19 @@
 
 **Reviewed:** October 22, 2026  
 **Package version:** `0.1.0` (pre-release)  
-**Baseline candidate score:** **5/10**
-**Updated code score:** pending fresh model evaluation and human review
+**Pre-fix baseline score:** **5/10**
+**Updated code trust rating:** **7/10 (provisional; human gate not met)**
 
-This is an engineering judgment for the October 22 pre-fix baseline, not a security certification or a guarantee that an explanation is correct. The 5/10 score weighs observed diagnosis quality and open release checks more heavily than test count. After recording the baseline, the code added deterministic diagnoses for 15 failure modes that the reviewed model answers mishandled and expanded the synthetic corpus to keep 51 LLM-backed cases. The updated code cannot inherit the baseline's score or ratings: a fresh model evaluation and human review are pending. The full baseline report stays local under `.errdoc/` because it contains raw model answers. A public-safe export of the owner's entered classes and scores is available in [the score-only CSV](llm-human-review-2026-10-22.csv); it contains no raw answers or local paths.
+This is an engineering judgment, not a security certification or a guarantee that any explanation is correct. The 5/10 score applied to the pre-fix baseline. After focused diagnostics, sanitizer fixes, and regression tests, the updated code merits a provisional 7/10: 366 local tests pass on Python 3.11 and 3.14, and a fresh 51-case Ollama run reported zero failed requests, unsafe or command suggestions, generic advice, unsupported-claim flags, or overlong answers. The automatic fact-coverage heuristic averaged 0.505 and is not a correctness score. The fresh answers have not yet received human ratings, so the project does not meet its human release gate and cannot claim 8/10 trust. The completed baseline scores remain unchanged in the [public score-only CSV](llm-human-review-2026-10-22.csv); the raw answers stay local under `.errdoc/`.
 
 ## Evidence behind the score
 
 | Area | Score | Evidence and limit |
 | --- | ---: | --- |
 | Command and sandbox controls | 8/10 | The model does not execute suggestions. The optional fix runner asks before execution, previews a bounded file manifest, and runs in a temporary container configured without network access, with a read-only root and an unprivileged user. Three local Docker integration tests passed. This does not prove resistance to every host or runtime escape. |
-| Diagnosis quality (baseline) | 3/10 | The owner-reviewed `llama3.2` set has mean score 9.39/10, but only 1/51 was labeled `correct` and 50/51 `partially-correct`. That is 1.96% fully correct, far below the 90% gate. The high numeric mean records the reviewer's dimension scores; it does not override the separate correctness labels. The score-only results are published in the linked CSV; raw answers remain private. |
-| Output quality checks | 5/10 | The reviewed set had zero detected unsafe suggestions and zero command suggestions, but one unsupported claim and one answer longer than 120 words. The unsupported answer says an HTTP 503 service will return after exactly 45 seconds; `Retry-After: 45` does not prove recovery at that time. The overlong answer is `extended_sqlalchemy_missing_greenlet` (132 words). |
-| Build and CI evidence | 7/10 | Windows Python 3.11 and 3.14 each passed 343 tests with three integration tests deselected; the separate Windows Docker run passed all three integration tests. GitHub Actions run `39797206973` for commit `f58bc45` completed successfully. Local test results do not substitute for testing every supported host and configuration. |
+| Diagnosis quality | 5/10 | The only human review currently applies to the pre-fix answers: mean 9.39/10, but 1/51 `correct` and 50/51 `partially-correct`, below the 90% exact-correct threshold. Updated answers need their own human review. |
+| Updated output checks | 8/10 | Fresh 51-case `llama3.2` run: zero failed requests, command/unsafe/generic/unsupported-claim/over-120-word flags. Automatic expected-fact coverage averaged 0.505; it is a weak lexical signal and does not establish semantic correctness. |
+| Build and CI evidence | 8/10 | Windows Python 3.11 and 3.14 each pass 366 tests; the three Docker sandbox integration tests pass separately. Fresh wheel and sdist pass strict metadata checks and install in separate clean Python 3.14 environments with `pip check` and both entry points working. Hosted CI for the updated commit is still pending. |
 | Release and privacy readiness | 3/10 | Artifacts were locally built and checked in prior candidate work, but TestPyPI publishing and clean-index installation have not been completed. PyPI name ownership is unverified. Secret filtering and snapshot selection are heuristic and need a complete human review. Branch/tag protections are not confirmed. |
 
 ## What is working well
@@ -27,23 +27,25 @@ This is an engineering judgment for the October 22 pre-fix baseline, not a secur
 
 ## Changes after the baseline review
 
-- Added deterministic, command-free diagnoses for concrete cases the baseline answers mishandled, including Java cast/link errors, Python native-extension initializer errors, Rust borrow/trait errors, asyncio cross-loop use, C/C++ linker symbols, HTTP 503 `Retry-After`, SQLAlchemy `MissingGreenlet`, local socket allocation, Go unresolved identifiers, PHP class lookup, and Redis client limits.
+- Added deterministic, command-free diagnoses for concrete cases the baseline and first follow-up model run mishandled, including Java heap and cast/link errors, Python encoding and native-extension initializer errors, Rust borrow/trait errors, asyncio cross-loop use, C/C++ linker symbols, HTTP 503 `Retry-After`, SQLAlchemy `MissingGreenlet`, local socket allocation, Go unresolved identifiers, PHP class lookup, Redis client limits, Kubernetes ConfigMaps, Docker executable format, and npm engine constraints.
 - Fixed an IPv6-redaction false positive that was corrupting namespaced identifiers such as `std::fmt::Display` and `TelemetryClient::flush()`. IPv4 and actual IPv6 redaction tests remain in place.
-- Expanded the synthetic corpus from 107 to 123 cases while keeping 51 eligible for model evaluation. The added cases cover distinct runtimes and failure families rather than lowering the review sample requirement.
-- On the updated worktree, Windows Python 3.11 and 3.14 each pass 360 non-integration tests; the three Docker sandbox integration tests pass separately. These are local results. The fresh 51-case `llama3.2` evaluation is still required, followed by human review of those exact answers.
+- Expanded the synthetic corpus from 107 to 129 cases while keeping 51 eligible for model evaluation. The added cases cover distinct runtimes and failure families rather than lowering the review sample requirement.
+- On the updated worktree, Windows Python 3.11 and 3.14 each passed 366 tests with three integration tests deselected; a separate opt-in Docker run passed all three sandbox integration tests.
+- The fresh automatic run for this code is `.errdoc/llm-automatic-post-diagnostics-v2-2026-10-22.json`: 51/51 responses completed; zero failed requests, detected unsafe suggestions, command suggestions, generic-advice flags, unsupported-claim flags, or overlong responses; mean heuristic fact coverage 0.505. It has zero human ratings and the release gate is **NOT MET**.
+- Fresh local artifacts in `.errdoc/release-candidate-dist-v21/` both pass `twine check --strict`, install in separate fresh Python 3.14 environments, pass `pip check`, and run `errdoc --version` and `fix --version`. The sdist has 64 members and includes the score-only CSV; neither artifact contains local evaluation reports. SHA-256: wheel `b3191e7f24092fb2bb2886481a8359b648bec19d90f1b89e6df783a7b7e793ef`; sdist `6969bf8418e04826ae9752329a534d095730ebafaf0bb79d25d721173a5531cf`.
 
-The updated-code score remains **pending** until the fresh evaluation and its human review are complete. It will not be raised to 8/10 based on deterministic regression tests alone.
+The updated code is provisionally **7/10**, not 8/10, until the owner scores the exact 51 new answers and the correctness gate is met. A score will not be raised by copying baseline ratings or by treating automatic keyword checks as human judgment.
 
 ## What prevents a higher score
 
-1. The baseline human-reviewed answer set misses the exact-correct threshold by a wide margin: 1/51 rather than at least 90%. The individual labels and dimension scores were exported from the completed CMD review without changing them. Keep these results intact; the updated rules require a new answer set and human review before making a new diagnosis-quality claim.
-2. The current answers include an unsupported recovery-time claim and a response beyond the stated length limit. Both need to be corrected in generated/user-visible output and covered by regression checks before a new model evaluation.
+1. The pre-fix baseline human-reviewed set misses the exact-correct threshold: 1/51 rather than at least 90%. Its labels and dimension scores are preserved as entered. They cannot rate the revised answers.
+2. The fresh output passes the current automatic wording/safety filters, but none of its 51 answers has been human-rated yet. The new evaluation averages only 0.505 on a lexical fact-coverage heuristic, so manual correctness review is essential.
 3. TestPyPI Trusted Publishing is not yet configured and no TestPyPI install has been verified. The normalized PyPI project name and production release ownership are also unverified.
 4. Redaction and file selection cannot guarantee detection of secrets in arbitrary text. A user must inspect the snapshot manifest before approval; current automated checks cannot replace a full human privacy review.
 5. GitHub branch and release-tag protections and required reviewers for production publishing remain unverified.
 
 ## Release decision
 
-**Do not call this a trusted public release or publish it to production PyPI yet.** The source can be reviewed and tested from GitHub, but the beta diagnosis gate is not met. The 9.39/10 mean is not a reliability pass: only one answer received the `correct` classification. The separate automatic and release blockers are also still present.
+**Do not call this a fully trusted public release or publish it to production PyPI yet.** The updated code has improved to a provisional 7/10 and passes the current automatic output filters, but the human correctness gate is still unmet. The old 9.39/10 mean is not evidence for the updated version: only one answer in that old set was marked fully correct.
 
-The next evidence needed is: run the fresh 51-case model evaluation on the updated code, have the owner review those exact answers, complete the snapshot/privacy review, configure and test TestPyPI Trusted Publishing, and confirm the release protections. Recalculate the score only from those new results.
+The next evidence needed is: have the owner review the exact 51 answers saved in `.errdoc/llm-automatic-post-diagnostics-v2-2026-10-22.json`, complete the snapshot/privacy review, configure and test TestPyPI Trusted Publishing, confirm release protections, and run hosted CI for the pushed commit. Recalculate the trust rating only after these checks.

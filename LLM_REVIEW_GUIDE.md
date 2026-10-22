@@ -52,14 +52,14 @@ The corpus currently contains 51 LLM-backed fixtures. The first command asks the
 
 The 51 saved answers in the pre-fix `llama3.2` baseline were reviewed and recorded locally in `.errdoc\llm-human-review-2026-10-22.json`. The mean numeric score is 9.39/10, but the separate class counts are 1 `correct`, 50 `partially-correct`, 0 `incorrect`, and 0 `unsafe`. The exact-correct rate is 1/51 (1.96%), so that review did **not** pass the 90% beta gate. It also had one automatic unsupported-claim flag and one over-120-word answer. The sanitized human-entered scores and classifications are preserved in [the public score-only CSV](docs/llm-human-review-2026-10-22.csv); raw answers remain local. Do not interpret the high numeric mean as a reliability pass or change entered labels just to make the gate pass.
 
-The current worktree adds deterministic handling for reviewed failure patterns and expands the corpus to 123 cases while preserving 51 model-backed cases. A fresh evaluation of those 51 model-backed cases is in progress at `.errdoc\llm-automatic-post-diagnostics-2026-10-22.json`. Once it completes, review that exact output to assess the updated model set; the baseline ratings cannot be transferred. The full raw report stays local. The aggregate assessment and release blockers are documented in [the trust assessment](docs/trust-assessment-2026-10-22.md).
+The updated code adds deterministic handling for reviewed failure patterns and expands the corpus to 129 cases while preserving 51 model-backed cases. The fresh evaluation is complete and saved at `.errdoc\llm-automatic-post-diagnostics-v2-2026-10-22.json`: all 51 requests succeeded and automatic checks found no unsafe/command suggestions, generic advice, unsupported-claim flags, or overlong answers. Human-rated case count is still zero for this exact updated output. The completed baseline ratings cannot be transferred because they belong to different answers. The full raw report stays local. The aggregate assessment and remaining release blockers are documented in [the trust assessment](docs/trust-assessment-2026-10-22.md).
 
-After the automatic report says it saved the complete 51-case file, start its human review from Command Prompt with:
+To score these exact updated answers from Command Prompt, run:
 
 ```cmd
 cd /d D:\errdoc
 .venv\Scripts\activate.bat
-python scripts\evaluate_llm.py --llm-only --review-existing .errdoc\llm-automatic-post-diagnostics-2026-10-22.json --reviewer Mhdjamadi1994 --output .errdoc\llm-human-review-post-diagnostics-2026-10-22.json
+python scripts\evaluate_llm.py --llm-only --review-existing .errdoc\llm-automatic-post-diagnostics-v2-2026-10-22.json --reviewer Mhdjamadi1994 --output .errdoc\llm-human-review-post-diagnostics-v2-2026-10-22.json
 ```
 
 The exported result will only be eligible for public release after its accuracy and automatic safety gates pass. The raw report should stay local; publish only a score-only CSV after verifying every row against the completed human report.

@@ -140,6 +140,36 @@ def test_additional_reviewed_diagnostics_are_deterministic(error, expected, forb
             "version mismatch",
         ),
         (
+            "Exception in thread \"worker-3\" java.lang.OutOfMemoryError: Java heap space\n    at com.example.importer.CsvParser.parse(CsvParser.java:118)",
+            "Java exhausted its available Java heap space",
+            "memory leak",
+        ),
+        (
+            "UnicodeEncodeError: 'ascii' codec can't encode character at position 12: ordinal not in range(128)",
+            "output-encoding failure",
+            "input data is invalid",
+        ),
+        (
+            "Bundler::GemNotFound: Could not find gem 'ffi (>= 1.15)' with platform 'x86_64-linux' in installed gems",
+            "could not find gem ffi (>= 1.15) for platform x86_64-linux",
+            "bundle install",
+        ),
+        (
+            'MountVolume.SetUp failed for volume "settings": configmap "api-settings" not found',
+            "ConfigMap api-settings was not found in the pod's namespace",
+            "kubectl get configmap",
+        ),
+        (
+            "standard_init_linux.go: exec user process caused: exec format error\nContainer: worker",
+            "file format is not accepted by the host",
+            "the image architecture is incompatible",
+        ),
+        (
+            "npm ERR! code EBADENGINE\nnpm ERR! engine Unsupported engine\nnpm ERR! required: { node: '>=22' }\nnpm ERR! current: { node: '20.11.1' }",
+            "requirement is >=22, while this environment reports 20.11.1",
+            "npm install",
+        ),
+        (
             "HTTP/1.1 503 Service Unavailable\nRetry-After: 45\nEndpoint: https://api.example.invalid/v1/inventory",
             "does not guarantee recovery by then",
             "will become available again after 45 seconds",

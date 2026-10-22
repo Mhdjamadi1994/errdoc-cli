@@ -81,7 +81,7 @@ _PYTHON_UNICODE_DECODE = re.compile(
     re.I,
 )
 _PYTHON_UNICODE_ENCODE = re.compile(
-    r"UnicodeEncodeError:\s*['\x22]([^'\x22]+)['\x22] codec can't encode character(?:\s+['\x22].*?['\x22])?\s+in position (\d+)",
+    r"UnicodeEncodeError:\s*['\x22]([^'\x22]+)['\x22] codec can't encode character(?:\s+['\x22].*?['\x22])?\s+(?:in|at) position (\d+)",
     re.I,
 )
 _PYTHON_PICKLE_LOCAL = re.compile(r"Can't pickle local object ['\x22]([^'\x22]+<locals>\.[^'\x22]+)['\x22]", re.I)
@@ -132,6 +132,17 @@ _NODE_EADDRNOTAVAIL = re.compile(r"\bEADDRNOTAVAIL\b", re.I)
 _GO_UNDEFINED = re.compile(r"(?m)^\s*\S+\.go:\d+:\d+:\s+undefined:\s+([A-Za-z_][A-Za-z0-9_]*)\s*$")
 _PHP_CLASS_NOT_FOUND = re.compile(r"Class\s+['\"]([^'\"]+)['\"]\s+not found", re.I)
 _REDIS_MAX_CLIENTS = re.compile(r"max number of clients reached", re.I)
+_JAVA_HEAP_EXHAUSTED = re.compile(r"java\.lang\.OutOfMemoryError:\s*Java heap space", re.I)
+_RUBY_BUNDLER_PLATFORM = re.compile(
+    r"Bundler::GemNotFound:.*?Could not find gem ['\"]([^'\"]+)\s*\(([^)]+)\)['\"] with platform ['\"]([^'\"]+)['\"]",
+    re.I | re.S,
+)
+_K8S_CONFIGMAP_MISSING = re.compile(
+    r"MountVolume\.SetUp failed for volume ['\"]([^'\"]+)['\"]:\s*configmap ['\"]([^'\"]+)['\"] not found",
+    re.I,
+)
+_DOCKER_EXEC_FORMAT = re.compile(r"exec user process caused:\s*exec format error", re.I)
+_NPM_ENGINE_MISMATCH = re.compile(r"npm ERR! code EBADENGINE.*?npm ERR! engine Unsupported engine", re.I | re.S)
 _DOTNET_ASSEMBLY_NOT_FOUND = re.compile(
     r"Could not load file or assembly\s+['\x22]([^,'\x22]+),\s*Version=([^,'\x22]+)",
     re.I,
@@ -256,10 +267,67 @@ def _known_diagnosis(error: str) -> str | None:
         codec, position = encoded.groups()
         return (
             "**Diagnosis**\n"
-            f"Python could not encode a character at position {position} using {codec}. The error occurs while text is being encoded; it does not show that the input file is corrupted.\n\n"
+            f"Python could not encode a character at position {position} using {codec}. This is an output-encoding failure; the message does not identify the character's source.\n\n"
             "**Steps**\n\n"
             "1. Check the destination and output stream encoding used by the failing operation.\n"
             f"2. Use an encoding supported by that destination and verify how it handles characters outside {codec}."
+        )
+
+    if _JAVA_HEAP_EXHAUSTED.search(error):
+        frame = re.search(r"at\s+([\w.$]+\.([\w$]+))\(([^()]+\.java:\d+)\)", error)
+        location = f" during {frame.group(1)} ({frame.group(3)})" if frame else ""
+        return (
+            "**Diagnosis**\n"
+            f"Java exhausted its available Java heap space{location}. The exception confirms heap exhaustion but does not identify which objects use the memory.\n\n"
+            "**Steps**\n\n"
+            "1. Inspect allocation and retained-object behavior around the failing operation.\n"
+            "2. Check the input size, batch size, and heap limit used by this run before changing memory settings."
+        )
+
+    ruby_platform = _RUBY_BUNDLER_PLATFORM.search(error)
+    if ruby_platform:
+        gem, constraint, platform = (part.strip() for part in ruby_platform.groups())
+        return (
+            "**Diagnosis**\n"
+            f"Bundler could not find gem {gem} ({constraint}) for platform {platform} among the installed gems. The error does not show that the gem is missing from every registry or absent from the Gemfile.\n\n"
+            "**Steps**\n\n"
+            "1. Check the lockfile's platforms and the platform of the environment running Bundler.\n"
+            "2. Verify that the selected gem release provides a compatible package for that platform."
+        )
+
+    missing_configmap = _K8S_CONFIGMAP_MISSING.search(error)
+    if missing_configmap:
+        volume, configmap = missing_configmap.groups()
+        return (
+            "**Diagnosis**\n"
+            f"Kubernetes could not mount volume {volume} because the referenced ConfigMap {configmap} was not found in the pod's namespace.\n\n"
+            "**Steps**\n\n"
+            "1. Check that the ConfigMap exists in the same namespace as the pod.\n"
+            "2. Verify the workload's volume reference and the ConfigMap name."
+        )
+
+    if _DOCKER_EXEC_FORMAT.search(error):
+        container = re.search(r"(?im)^Container:\s*([^\s]+)", error)
+        name = f"Container {container.group(1)}" if container else "The container process"
+        return (
+            "**Diagnosis**\n"
+            f"{name} failed with exec format error: the runtime could not execute the configured entrypoint because its file format is not accepted by the host. An architecture mismatch is one possibility; the log alone does not prove it.\n\n"
+            "**Steps**\n\n"
+            "1. Check that the image platform matches the host and deployment target.\n"
+            "2. Inspect the configured entrypoint's executable format, interpreter line, and line endings."
+        )
+
+    if _NPM_ENGINE_MISMATCH.search(error):
+        required = re.search(r"required:.*?node:\s*['\"]([^'\"]+)['\"]", error, re.I | re.S)
+        current = re.search(r"current:.*?node:\s*['\"]([^'\"]+)['\"]", error, re.I | re.S)
+        requirement = f"{required.group(1)}" if required else "the package's declared Node.js version"
+        running = f"{current.group(1)}" if current else "the current Node.js runtime"
+        return (
+            "**Diagnosis**\n"
+            f"npm rejected the package because its Node.js engine requirement is {requirement}, while this environment reports {running}. This is a runtime-version mismatch.\n\n"
+            "**Steps**\n\n"
+            "1. Check the package's engine declaration and the project's pinned Node.js version.\n"
+            "2. Use a Node.js release supported by both the project and the package."
         )
 
     java_cast = _JAVA_CLASS_CAST.search(error)

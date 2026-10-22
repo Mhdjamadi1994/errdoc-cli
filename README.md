@@ -16,6 +16,8 @@ errdoc runs a command you choose, collects its error output, and explains it in 
 
 > **Project status: pre-release.** The source code is public on GitHub, but the package has not been published to PyPI. AI explanations can be wrong. Read the privacy and safety notes below before using real logs or the optional fix runner.
 
+**Trust and evaluation:** The updated code is provisionally rated 7/10. Its latest 51-answer automatic review had no flagged unsafe or unsupported output, but those answers still need human scoring; the older 9.39/10 human average belongs to a different version and does not prove this one is reliable. See the [full trust assessment](docs/trust-assessment-2026-10-22.md), [human review steps](LLM_REVIEW_GUIDE.md), and [quality gates](QUALITY_GATES.md).
+
 ## How it works
 
 1. You choose a command to run or a log to inspect.

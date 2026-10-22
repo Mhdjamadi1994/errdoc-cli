@@ -30,7 +30,7 @@ This document records the release requirements for a trustworthy public beta. A 
 
 ### 2. Diagnosis Quality
 
-- [x] Maintain a diverse 123-case synthetic corpus with 72 deterministic routes and 51 LLM-backed cases spanning Python, Django, Node.js, npm, Git, CMake, Cargo, Docker, shell tools, JSON config, pytest, PostgreSQL, Go, Kubernetes, Terraform, Java, .NET, Windows, databases, and network errors. Case identifiers are regression-tested for uniqueness.
+- [x] Maintain a diverse 129-case synthetic corpus with 78 deterministic routes and 51 LLM-backed cases spanning Python, Django, Node.js, npm, Git, CMake, Cargo, Docker, shell tools, JSON config, pytest, PostgreSQL, Go, Kubernetes, Terraform, Java, .NET, Windows, databases, and network errors. Case identifiers are regression-tested for uniqueness.
 - [ ] Evaluate each model/provider against a documented expected-cause rubric, actionable-step rubric, and unsafe-or-unsupported-command rubric.
 - [x] The evaluation report records expected-fact coverage, generic advice, command suggestions, unsafe-command heuristics, and per-response failure state; interactive review records correct/partially-correct/incorrect plus a 10-point score.
 - [x] Bound command output to 512 KiB per stream, file logs to 2 MiB, and piped input to 1,000,000 characters; retain the tail and mark omitted earlier output.
@@ -132,7 +132,7 @@ The project remains a pre-release development build. Commit `0b38663` passed hos
 
 The offline human review of the October 22 baseline's 51 answers is saved locally at `.errdoc/llm-human-review-2026-10-22.json`; the score-only export is `docs/llm-human-review-2026-10-22.csv`. It records a 9.39/10 mean numeric score, but only 1 `correct` classification and 50 `partially-correct` classifications (1/51 = 1.96% exactly correct). No response was marked incorrect or unsafe. The beta gate was **NOT MET** because it requires at least 90% exact-correct classifications; the same answer set had one unsupported claim and one response over 120 words. A high mean score does not override the independently recorded correctness classes. The raw report stays local and is not included in GitHub distributions. This is historical evidence for the pre-fix output set; it cannot rate the updated code.
 
-After documentation updates, GitHub Actions run `39797206973` for commit `f58bc45` completed successfully. That workflow result validates that commit only. The latest focused-diagnostics changes are under a fresh 51-case model evaluation and require a new human review; their CI status will be recorded after push.
+After documentation updates, GitHub Actions run `39797206973` for commit `f58bc45` completed successfully. The focused-diagnostics changes at `52f17ba` passed GitHub Actions run `39814490712`. Those are historical CI runs; the current follow-up commit still requires its own hosted run.
 
 ## Release candidate verification (October 21, 2026)
 
@@ -155,3 +155,12 @@ After documentation updates, GitHub Actions run `39797206973` for commit `f58bc4
 - Rebuilt wheel and sdist are under `.errdoc/release-candidate-dist-v20/`. Both pass `twine check --strict`; separate fresh Python 3.14 environments pass install, `pip check`, `errdoc --version`, and `fix --version`. Their SHA-256 values and the trust assessment are recorded in `.errdoc/release-readiness-fa-2026-10-22.md`.
 - The sdist contains 62 members and excludes local `.errdoc` evaluation reports. This is a local content check, not a full secret-scanning guarantee.
 - The matching commit passed hosted CI; current-prompt human review, TestPyPI upload/install, and publication remain pending.
+
+## Latest follow-up verification (October 22, 2026)
+
+- Windows Python 3.11 and 3.14: 366 passed on each, 3 integration tests deselected. These local results include the latest diagnostic handlers and corpus cases.
+- Fresh Ollama `llama3.2` evaluation: 51/51 requests completed; 0 failed requests, unsafe suggestions, command suggestions, bare tool references, generic-advice flags, unsupported-claim flags, over-120-word responses, and 0 human ratings. Automatic expected-fact coverage averaged 0.505; this keyword heuristic is not a correctness metric. Report: `.errdoc/llm-automatic-post-diagnostics-v2-2026-10-22.json`.
+- Public-beta gate: **NOT MET**. The updated answer set still needs at least 50 human ratings, mean at least 8.5/10, and at least 90% `correct` classifications. To enter scores in Command Prompt, follow the exact command in `LLM_REVIEW_GUIDE.md`; do not reuse the pre-fix ratings.
+- The fresh opt-in Docker sandbox suite passed all 3 integration tests.
+- New wheel and sdist in `.errdoc/release-candidate-dist-v21/` pass `twine check --strict`, separate clean Python 3.14 installs, `pip check`, and `errdoc --version` / `fix --version` smoke checks. The sdist contains 64 members and the score-only CSV; neither artifact includes local evaluation reports. No TestPyPI or PyPI upload has occurred.
+- GitHub Actions for the follow-up commit must still complete after push.
