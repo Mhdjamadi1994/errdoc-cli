@@ -69,11 +69,22 @@ _PG_CONNECTION_SLOTS = re.compile(r"remaining connection slots are reserved", re
 _GO_MODULE_MISSING = re.compile(r"no required module provides package\s+([^;\s]+)", re.I)
 _K8S_IMAGE_PULL = re.compile(r"Failed to pull image\s+['\x22]([^'\x22]+)['\x22]", re.I)
 _K8S_IMAGE_PULL_BACKOFF = re.compile(r"ImagePullBackOff|Back-off pulling image", re.I)
+_K8S_READINESS_HTTP = re.compile(r"Readiness probe failed:\s*HTTP probe failed with statuscode:\s*(\d{3})", re.I)
+_K8S_LIVENESS_HTTP = re.compile(r"Liveness probe failed:\s*HTTP probe failed with statuscode:\s*(\d{3})", re.I)
 _PYTHON_MP_BOOTSTRAP = re.compile(
     r"An attempt has been made to start a new process before the current process has finished its bootstrapping phase",
     re.I,
 )
 _PYTHON_ZERO_DIVISION = re.compile(r"ZeroDivisionError:\s*division by zero", re.I)
+_PYTHON_UNICODE_DECODE = re.compile(
+    r"UnicodeDecodeError:\s*['\x22]([^'\x22]+)['\x22] codec can't decode byte (0x[0-9a-f]+) in position (\d+)",
+    re.I,
+)
+_PYTHON_UNICODE_ENCODE = re.compile(
+    r"UnicodeEncodeError:\s*['\x22]([^'\x22]+)['\x22] codec can't encode character(?:\s+['\x22].*?['\x22])?\s+in position (\d+)",
+    re.I,
+)
+_PYTHON_PICKLE_LOCAL = re.compile(r"Can't pickle local object ['\x22]([^'\x22]+<locals>\.[^'\x22]+)['\x22]", re.I)
 _PYTHON_DATETIME_UTC_MISSING = re.compile(
     r"AttributeError:\s*module\s+['\x22]datetime['\x22]\s+has no attribute\s+['\x22]UTC['\x22].*?Python runtime:\s*3\.10(?:\.\d+)?\b",
     re.I | re.S,
@@ -90,6 +101,7 @@ _DOTNET_TYPELOAD_METHOD = re.compile(
     re.I | re.S,
 )
 _MYSQL_ACCESS_DENIED = re.compile(r"Access denied for user\s+['\x22]([^'\x22]+)['\x22]@['\x22]([^'\x22]+)['\x22]", re.I)
+_MYSQL_LOCK_WAIT_TIMEOUT = re.compile(r"(?:1205\s+\(HY000\):\s*)?Lock wait timeout exceeded", re.I)
 _SQL_UNIQUE_CONSTRAINT = re.compile(r"UNIQUE constraint failed:\s*([^\s\]\[]+)", re.I)
 _POWERSHELL_POLICY = re.compile(r"cannot be loaded because running scripts is disabled", re.I)
 _WINDOWS_DLL_FAILURE = re.compile(r"DLL load failed while importing\s+([\w.]+)", re.I)
@@ -99,6 +111,12 @@ _JAVA_CLASS_VERSION = re.compile(
     re.I | re.S,
 )
 _DISK_FULL = re.compile(r"No space left on device|\bDisk full\b", re.I)
+_JAVA_MISSING_CLASS = re.compile(r"(?:NoClassDefFoundError|ClassNotFoundException):\s*([\w/$.-]+)", re.I)
+_JAVA_CLASS_CAST = re.compile(r"ClassCastException:\s*class\s+([\w.$]+)\s+cannot be cast to class\s+([\w.$]+)", re.I)
+_DOTNET_ASSEMBLY_NOT_FOUND = re.compile(
+    r"Could not load file or assembly\s+['\x22]([^,'\x22]+),\s*Version=([^,'\x22]+)",
+    re.I,
+)
 _PROXY_AUTH_REQUIRED = re.compile(r"(?:407\s+Proxy Authentication Required|Tunnel connection failed.*\b407\b)", re.I | re.S)
 _SUGGESTED_COMMAND_SECTION = re.compile(
     r"(?im)^\s*(?:#{1,6}\s*)?(?:\*{1,2})?\s*Suggested\s+command\b.*$"
@@ -109,10 +127,10 @@ _DIAGNOSTIC_DUMP = re.compile(
     r"(?i)^print\s*\(\s*(?:record|data|config|settings|environ|environment|env|request|headers|payload)\b"
 )
 _COMMAND_START = re.compile(
-    r"(?i)^(?:\$\s*)?(?:export|set|unset|python(?:\d+(?:\.\d+)?)?|py|pip\d*|npm|npx|yarn|pnpm|git|docker|podman|cargo|go(?![.\w-])|psql|dbshell|django-admin|manage\.py|cmake|pytest|curl|wget|kill|pkill|sudo|chmod|chown|cat|grep|find|cd|mkdir|rm|touch|node|taskkill|powershell|pwsh|get-executionpolicy|set-executionpolicy|df|du|ping|tracert|nslookup|ipconfig|netstat|create|alter|drop|grant|revoke|delete|update|insert)(?:\.exe)?(?![\w.-])"
+    r"(?i)^(?:\$\s*)?(?:export|set|unset|python(?:\d+(?:\.\d+)?)?|py|pip\d*|npm|npx|yarn|pnpm|git|docker|podman|cargo|go(?![.\w-])|psql|dbshell|django-admin|manage\.py|cmake|pytest|curl|wget|kill|pkill|sudo|chmod|chown|cat|grep|find|cd|mkdir|rm|touch|node|taskkill|powershell|pwsh|get-executionpolicy|set-executionpolicy|df|du|ping|tracert|nslookup|ipconfig|netstat|create|alter|drop|grant|revoke|delete|update|insert|bundle|terraform|kubectl|helm|gradle|mvn|java|dotnet|redis-cli|mysql|mongosh|systemctl|brew|apt(?:-get)?|winget|choco|uv|poetry|ruff|tox|pipenv|twine)(?:\.exe)?(?![\w.-])"
 )
 _BARE_TOOL_NAME = re.compile(
-    r"(?i)^(?:python(?:\d+(?:\.\d+)?)?|py|pip\d*|npm|npx|yarn|pnpm|git|docker|podman|cargo|go|psql|dbshell|django-admin|cmake|pytest|curl|wget)(?:\.exe)?$"
+    r"(?i)^(?:python(?:\d+(?:\.\d+)?)?|py|pip\d*|npm|npx|yarn|pnpm|git|docker|podman|cargo|go|psql|dbshell|django-admin|cmake|pytest|curl|wget|bundle|terraform|kubectl|helm|gradle|mvn|java|dotnet|redis-cli|mysql|mongosh|systemctl|brew|apt(?:-get)?|winget|choco|uv|poetry|ruff|tox|pipenv|twine)(?:\.exe)?$"
 )
 _RUN_VERB = re.compile(r"(?i)\b(?:run(?:ning)?|rerun|retry|execute|invoke|launch)\s*$")
 _ENV_ASSIGNMENT = re.compile(r"^[A-Z_][A-Z0-9_]*\s*=")
@@ -203,6 +221,103 @@ def _safe_provider_error(value: object, api_key: str | None) -> str:
 
 
 def _known_diagnosis(error: str) -> str | None:
+    decoded = _PYTHON_UNICODE_DECODE.search(error)
+    if decoded:
+        codec, byte_value, position = decoded.groups()
+        return (
+            "**Diagnosis**\n"
+            f"Python could not decode byte {byte_value} at position {position} using {codec}. This does not by itself show whether the file uses another encoding or contains invalid data.\n\n"
+            "**Steps**\n\n"
+            "1. Check the file's documented or declared encoding and the code path that reads it.\n"
+            "2. Confirm the source bytes match that encoding before changing the decoder or input file."
+        )
+
+    encoded = _PYTHON_UNICODE_ENCODE.search(error)
+    if encoded:
+        codec, position = encoded.groups()
+        return (
+            "**Diagnosis**\n"
+            f"Python could not encode a character at position {position} using {codec}. The error occurs while text is being encoded; it does not show that the input file is corrupted.\n\n"
+            "**Steps**\n\n"
+            "1. Check the destination and output stream encoding used by the failing operation.\n"
+            f"2. Use an encoding supported by that destination and verify how it handles characters outside {codec}."
+        )
+
+    pickle_local = _PYTHON_PICKLE_LOCAL.search(error)
+    if pickle_local:
+        object_name = pickle_local.group(1)
+        return (
+            "**Diagnosis**\n"
+            f"Python could not pickle the local object {object_name}. A function or lambda defined inside another function is not available as a module-level name for standard multiprocessing serialization.\n\n"
+            "**Steps**\n\n"
+            "1. Move the worker callable to module scope and use a picklable callable.\n"
+            "2. Keep process startup behind the main-module guard when using the spawn start method."
+        )
+
+    java_class = _JAVA_MISSING_CLASS.search(error)
+    if java_class:
+        class_name = java_class.group(1)
+        return (
+            "**Diagnosis**\n"
+            f"The JVM could not load class {class_name} at runtime. The ClassNotFoundException in the log confirms class lookup failed; the log does not identify which dependency or launcher configuration omitted it.\n\n"
+            "**Steps**\n\n"
+            "1. Check that the runtime dependency containing this class is included in the deployed application.\n"
+            "2. Verify the classpath or launcher configuration used by this run."
+        )
+
+    cast = _JAVA_CLASS_CAST.search(error)
+    if cast:
+        source_type, target_type = cast.groups()
+        return (
+            "**Diagnosis**\n"
+            f"Java could not cast a value of type {source_type} to {target_type}. The error identifies incompatible runtime types, but not where the value originated.\n\n"
+            "**Steps**\n\n"
+            "1. Inspect the value-producing code and the cast at the reported location.\n"
+            "2. Check the data or API contract that determines the value's runtime type before converting it."
+        )
+
+    assembly = _DOTNET_ASSEMBLY_NOT_FOUND.search(error)
+    if assembly:
+        assembly_name, version = assembly.groups()
+        return (
+            "**Diagnosis**\n"
+            f".NET could not resolve assembly {assembly_name}, version {version}. The message does not establish whether the file is missing from deployment output or whether assembly resolution selected an incompatible location.\n\n"
+            "**Steps**\n\n"
+            "1. Check that the intended assembly is present in the published application output.\n"
+            "2. Verify the deployed version and the application's assembly-loading configuration."
+        )
+
+    if _MYSQL_LOCK_WAIT_TIMEOUT.search(error):
+        return (
+            "**Diagnosis**\n"
+            "MySQL reports that a transaction waited too long to acquire a lock. This lock-wait timeout is not, by itself, evidence of a deadlock.\n\n"
+            "**Steps**\n\n"
+            "1. Identify the transaction or session holding the conflicting lock using the database's approved monitoring tools.\n"
+            "2. Review transaction duration and lock ordering around the affected operation before changing timeout settings."
+        )
+
+    readiness = _K8S_READINESS_HTTP.search(error)
+    if readiness:
+        status = readiness.group(1)
+        return (
+            "**Diagnosis**\n"
+            f"Kubernetes reports that the readiness probe received HTTP {status}. The container did not pass this readiness check; the event does not identify why the application returned that status.\n\n"
+            "**Steps**\n\n"
+            "1. Review the container logs and the configured health endpoint for the same time as the probe failure.\n"
+            "2. Check the readiness probe path, port, and thresholds against the application's health behavior."
+        )
+
+    liveness = _K8S_LIVENESS_HTTP.search(error)
+    if liveness:
+        status = liveness.group(1)
+        return (
+            "**Diagnosis**\n"
+            f"Kubernetes reports that the liveness probe received HTTP {status}. The application did not pass its liveness check; this event does not show the underlying application cause.\n\n"
+            "**Steps**\n\n"
+            "1. Review the container logs and the configured liveness endpoint around the reported time.\n"
+            "2. Check the probe path, port, and thresholds against the application's health behavior."
+        )
+
     if _PYTHON_DATETIME_UTC_MISSING.search(error):
         return (
             "**Diagnosis**\n"

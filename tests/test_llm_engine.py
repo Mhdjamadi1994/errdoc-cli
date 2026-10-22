@@ -80,6 +80,34 @@ def test_reviewed_failure_modes_use_deterministic_evidence_based_diagnosis(error
     assert needs_llm(error) is False
 
 
+@pytest.mark.parametrize(
+    ("error", "expected", "forbidden"),
+    [
+        ("UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 12: invalid start byte", "could not decode byte 0xff", "corrupted"),
+        ("UnicodeEncodeError: 'ascii' codec can't encode character in position 4: ordinal not in range(128)", "could not encode a character", "input-data issue"),
+        ("AttributeError: Can't pickle local object 'build.<locals>.worker'", "could not pickle the local object", "binary linkage"),
+        ("java.lang.ClassNotFoundException: com.example.ReportClient", "could not load class com.example.ReportClient", "binary linkage incompatibility"),
+        ("java.lang.ClassCastException: class java.lang.String cannot be cast to class java.lang.Integer", "could not cast", "missing class"),
+        ("Readiness probe failed: HTTP probe failed with statuscode: 503", "readiness probe received HTTP 503", "image pull failure"),
+        ("Liveness probe failed: HTTP probe failed with statuscode: 500", "liveness probe received HTTP 500", "authentication and authorization"),
+        ("ERROR 1205 (HY000): Lock wait timeout exceeded; try restarting transaction", "waited too long to acquire a lock", "detected deadlock"),
+        ("System.IO.FileNotFoundException: Could not load file or assembly 'Contoso.Data, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null'. The system cannot find the file specified.", "could not resolve assembly Contoso.Data", "IP address"),
+    ],
+)
+def test_additional_reviewed_diagnostics_are_deterministic(error, expected, forbidden):
+    result = diagnose(error, {}, Config(provider="ollama", model="unused", base_url="http://127.0.0.1:1"))
+    assert expected.casefold() in result.casefold()
+    assert forbidden.casefold() not in result.casefold()
+    assert needs_llm(error) is False
+
+
+def test_inline_bundle_command_is_removed_from_model_response():
+    cleaned, removed = sanitize_model_response("Run `bundle config set --local platform x86_64-linux` to fix it.")
+    assert removed is True
+    assert "bundle config" not in cleaned
+    assert "[command example omitted]" in cleaned
+
+
 @contextmanager
 def _openai_compatible_http_server(response_body):
     requests = []

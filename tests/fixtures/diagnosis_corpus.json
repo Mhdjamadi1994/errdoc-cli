@@ -349,6 +349,7 @@
     "id": "java_classpath_missing",
     "project": "Java/JVM",
     "error": "Exception in thread \"main\" java.lang.NoClassDefFoundError: com/example/report/ReportClient\n    at com.example.app.Main.run(Main.java:42)\nCaused by: java.lang.ClassNotFoundException: com.example.report.ReportClient",
+    "must_not_contain": ["runtime binary linkage"],
     "fact_groups": [["NoClassDefFoundError", "ClassNotFoundException"], ["ReportClient"], ["classpath", "runtime dependency", "jar"]]
   },
   {
@@ -425,6 +426,7 @@
     "id": "python_unicode_decode_failure",
     "project": "Python",
     "error": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x96 in position 41: invalid start byte",
+    "must_not_contain": ["corrupted or malformed input file"],
     "fact_groups": [["UnicodeDecodeError", "utf-8"], ["byte 0x96", "position 41"], ["encoding", "source file", "decode"]]
   },
   {
@@ -487,6 +489,7 @@
     "id": "kubernetes_readiness_probe_503",
     "project": "Kubernetes",
     "error": "Warning Unhealthy\nReadiness probe failed: HTTP probe failed with statuscode: 503\nPod: api-7c9f8d\nContainer: api",
+    "must_not_contain": ["service that the readiness probe is targeting", "image pull failure", "authentication and authorization"],
     "fact_groups": [["Readiness probe failed", "Unhealthy"], ["503"], ["readiness probe", "application health endpoint", "container logs"]],
     "must_not_contain": ["service that the readiness probe is targeting"]
   },
@@ -528,6 +531,7 @@
     "id": "extended_py_ascii_encoding",
     "project": "Python",
     "error": "UnicodeEncodeError: 'ascii' codec can't encode character at position 12: ordinal not in range(128)",
+    "must_not_contain": ["input data"],
     "fact_groups": [
       [
         "UnicodeEncodeError",
@@ -547,6 +551,7 @@
     "id": "extended_py_pickle_local",
     "project": "Python",
     "error": "AttributeError: Can't pickle local object 'build_task.<locals>.<lambda>'",
+    "must_not_contain": ["runtime binary linkage incompatibility"],
     "fact_groups": [
       [
         "Can't pickle",
@@ -605,6 +610,7 @@
     "id": "extended_http_503_retry",
     "project": "HTTP/API",
     "error": "HTTP/1.1 503 Service Unavailable\nRetry-After: 45\nEndpoint: https://api.example.invalid/v1/inventory",
+    "must_not_contain": ["will become available again after 45 seconds"],
     "fact_groups": [
       [
         "503",
@@ -1051,6 +1057,7 @@
     "id": "extended_k8s_liveness_500",
     "project": "Kubernetes",
     "error": "Warning Unhealthy\nLiveness probe failed: HTTP probe failed with statuscode: 500\nPod: worker-6d4c\nContainer: worker",
+    "must_not_contain": ["Terraform state", "unlock the state", "maximum restart count", "pull error", "image pull failure", "authentication and authorization"],
     "fact_groups": [
       [
         "Liveness probe failed",
@@ -1133,6 +1140,7 @@
     "id": "extended_mysql_lock_timeout",
     "project": "MySQL",
     "error": "mysql.connector.errors.DatabaseError: 1205 (HY000): Lock wait timeout exceeded",
+    "must_not_contain": ["deadlock"],
     "fact_groups": [
       [
         "1205",
@@ -1175,6 +1183,7 @@
     "id": "extended_dotnet_assembly_load_failure",
     "project": "C#/.NET",
     "error": "System.IO.FileNotFoundException: Could not load file or assembly 'Contoso.Reporting, Version=3.2.0.0, Culture=neutral, PublicKeyToken=null'. The system cannot find the file specified.",
+    "must_not_contain": ["IP address"],
     "fact_groups": [
       [
         "FileNotFoundException"
@@ -1336,6 +1345,162 @@
       ["./internal.js"],
       ["telemetry-kit/package.json", "telemetry-kit"],
       ["public export", "supported entry point", "package exports map"]
+    ]
+  },
+  {
+    "id": "extended_go_test_timeout",
+    "project": "Go",
+    "error": "panic: test timed out after 10s\nrunning tests:\n\tTestWorker (10s)",
+    "fact_groups": [
+      [
+        "test timed out",
+        "panic: test timed out"
+      ],
+      [
+        "10s"
+      ],
+      [
+        "TestWorker"
+      ],
+      [
+        "test goroutine",
+        "blocked operation",
+        "test cleanup"
+      ]
+    ]
+  },
+  {
+    "id": "extended_k8s_failed_mount_configmap",
+    "project": "Kubernetes",
+    "error": "MountVolume.SetUp failed for volume \"settings\": configmap \"api-settings\" not found",
+    "fact_groups": [
+      [
+        "MountVolume.SetUp failed",
+        "volume"
+      ],
+      [
+        "configmap \"api-settings\" not found",
+        "api-settings"
+      ],
+      [
+        "namespace",
+        "referenced ConfigMap",
+        "deployment configuration"
+      ]
+    ]
+  },
+  {
+    "id": "extended_postgres_serialization_failure",
+    "project": "PostgreSQL",
+    "error": "ERROR: could not serialize access due to concurrent update\nSQLSTATE: 40001",
+    "fact_groups": [
+      [
+        "could not serialize access",
+        "serialization failure"
+      ],
+      [
+        "concurrent update"
+      ],
+      [
+        "transaction",
+        "retry whole transaction",
+        "isolation level"
+      ]
+    ]
+  },
+  {
+    "id": "extended_node_eaddrnotavail",
+    "project": "Node.js",
+    "error": "Error: connect EADDRNOTAVAIL 192.0.2.10:443 - Local (0.0.0.0:0)",
+    "fact_groups": [
+      [
+        "EADDRNOTAVAIL"
+      ],
+      [
+        "192.0.2.10:443"
+      ],
+      [
+        "local address",
+        "network interface",
+        "available local address"
+      ]
+    ]
+  },
+  {
+    "id": "extended_docker_unhealthy",
+    "project": "Docker",
+    "error": "Container api 5b9c is unhealthy",
+    "fact_groups": [
+      [
+        "unhealthy",
+        "health status"
+      ],
+      [
+        "container api"
+      ],
+      [
+        "healthcheck",
+        "health command",
+        "container logs"
+      ]
+    ]
+  },
+  {
+    "id": "extended_cmake_undefined_reference",
+    "project": "CMake/C++",
+    "error": "undefined reference to `TelemetryClient::flush()'\ncollect2: error: ld returned 1 exit status",
+    "fact_groups": [
+      [
+        "undefined reference",
+        "linker"
+      ],
+      [
+        "TelemetryClient::flush()"
+      ],
+      [
+        "definition",
+        "linked library",
+        "target linkage"
+      ]
+    ]
+  },
+  {
+    "id": "extended_asyncio_different_loop",
+    "project": "Python asyncio",
+    "error": "RuntimeError: Task <Task pending> got Future <Future pending> attached to a different loop",
+    "fact_groups": [
+      [
+        "Future",
+        "attached to a different loop"
+      ],
+      [
+        "RuntimeError"
+      ],
+      [
+        "event loop ownership",
+        "create future in same loop",
+        "cross-loop use"
+      ]
+    ]
+  },
+  {
+    "id": "extended_rust_trait_bound",
+    "project": "Rust",
+    "error": "error[E0277]: the trait bound `Widget: std::fmt::Display` is not satisfied\nrequired by this formatting parameter",
+    "fact_groups": [
+      [
+        "E0277",
+        "trait bound"
+      ],
+      [
+        "Widget",
+        "std::fmt::Display"
+      ],
+      [
+        "implement Display",
+        "change formatting",
+        "required trait"
+      ]
     ]
   }
 ]

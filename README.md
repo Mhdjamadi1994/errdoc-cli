@@ -1,226 +1,243 @@
-﻿# errdoc
+# errdoc
 
-**Turn a failed command into a useful next step—without handing your project to a model or running AI-generated fixes.** `errdoc` is a cross-platform CLI for developers who want a concise, evidence-based explanation of build, test, deployment, and runtime errors. It captures the failure, trims noisy output, redacts common secrets and identifying paths, then asks a local Ollama model or an OpenAI-compatible endpoint to explain it.
+**A command fails. errdoc helps you understand why.**
 
-```sh
-errdoc python -c "import missing_module"
-```
+errdoc runs a command you choose, collects its error output, and explains it in plain language. It can use a local Ollama model or an OpenAI-compatible service. It never runs commands suggested by a model.
 
-`errdoc` keeps command execution, diagnosis, and optional fixes separate: generated advice is untrusted and is never sent to the executor. If you explicitly choose `--execute-fix`, you review the exact project snapshot before confirming; the command runs in a disposable, network-disabled Docker or Podman container. You can also use `--no-llm` for local deterministic analysis.
+<p>
+  <a href="#quick-start">🚀 Quick start</a> ·
+  <a href="#choose-a-tool">🧰 Choose a tool</a> ·
+  <a href="#privacy-in-plain-words">🔒 Privacy</a> ·
+  <a href="#safe-fix-preview">📦 Safe fix preview</a> ·
+  <a href="#help-and-project-status">❓ Help and status</a>
+</p>
 
-**Designed for:** developers debugging unfamiliar tracebacks, CI failures, dependency errors, and deployment logs who want a quick explanation while keeping control of their data and changes.
+[![CI](https://github.com/Mhdjamadi1994/errdoc-cli/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/Mhdjamadi1994/errdoc-cli/actions/workflows/tests.yml) · Python 3.10+ · [MIT license](LICENSE) · [Private vulnerability reporting](SECURITY.md)
 
-The PyPI distribution is named `errdoc-cli`; it installs the `errdoc` command and the shorter `fix` alias. The package has not been published yet.
+> **Project status: pre-release.** The source code is public on GitHub, but the package has not been published to PyPI. AI explanations can be wrong. Read the privacy and safety notes below before using real logs or the optional fix runner.
 
-## On this page
+## How it works
 
-- [Install and choose a diagnosis provider](#install)
-- [Tools and capabilities](#tools-and-capabilities)
-- [Sandboxed fix execution](#sandboxed-fix-execution)
-- [Configuration](#configuration)
-- [Privacy and data flow](#privacy-and-data-flow)
-- [Development and tests](#development)
-- [Release readiness](#release-readiness)
+1. You choose a command to run or a log to inspect.
+2. errdoc trims long output and tries to hide common secrets and personal paths.
+3. It uses local rules or sends the sanitized error to the model provider you configured.
+4. It prints an explanation. You decide what to do next.
 
-## Requirements
+errdoc does not send your project snapshot to the diagnosis model. Model suggestions are untrusted and are never sent to the command runner.
 
-- Python 3.10 or newer
-- Ollama running locally, or an OpenAI-compatible chat completions API
+## Quick start
 
-## Install
+errdoc currently installs from this GitHub repository. **`pip install errdoc-cli` will not work yet** because the package is not on PyPI.
 
-After the first verified PyPI release, install the distribution with:
-
-```sh
-python -m pip install errdoc-cli
-```
-
-The package is not published yet. For development, install from this checkout as shown below.
-
-From this directory, create and activate a virtual environment, then install the project:
+You need Python 3.10 or newer. In a terminal:
 
 ```sh
+git clone https://github.com/Mhdjamadi1994/errdoc-cli.git
+cd errdoc-cli
 python -m venv .venv
 ```
 
-Windows PowerShell:
+Activate the environment and install errdoc:
+
+**Windows PowerShell**
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e .
 ```
 
-macOS or Linux:
+**macOS or Linux**
 
 ```sh
 source .venv/bin/activate
 python -m pip install -e .
 ```
 
-### Local Ollama
-
-Install [Ollama](https://ollama.com/download) using its official installer and make sure its local service is running. On Linux, start the service with the method used by your installation. Download a model separately; for the default model:
+For AI explanations, install and start [Ollama](https://ollama.com/), then download the default model:
 
 ```sh
 ollama pull llama3.2
-errdoc python -c "import missing_module"
 ```
 
-The first analysis may take longer while the model loads. Ollama requests go to the configured local URL by default. The `ollama pull` command downloads model data; errdoc itself does not download models.
-
-### OpenAI-compatible endpoint
-
-Set the provider, endpoint, model, and key in `~/.errdoc/config.json` or the matching `ERRDOC_*` environment variables, then run errdoc normally. Example configuration:
-
-```json
-{
-  "provider": "openai",
-  "model": "your-model-name",
-  "base_url": "https://your-provider.example/v1",
-  "api_key": null,
-  "timeout": 180,
-  "max_input_chars": 12000,
-  "max_output_tokens": 256
-}
-```
-
-Set `ERRDOC_API_KEY` from an operating-system secret store or another protected process environment. Do not put a real key in command-line arguments, shell history, or checked-in files. Use only an endpoint you trust: sanitized error text and limited project context are sent to that service.
-
-## Tools and capabilities
-
-| Tool or option | What it does | Details |
-| --- | --- | --- |
-| `errdoc <command> [arguments...]` | Runs a command and explains its failure | [Command analysis](#command-analysis) |
-| `errdoc --file error.log` | Analyzes an existing log file | [Log and pipe input](#log-and-pipe-input) |
-| `errdoc --no-llm <command> [arguments...]` | Uses local diagnosis rules without a model | [Offline diagnosis](#offline-diagnosis) |
-| Ollama or an OpenAI-compatible endpoint | Generates a concise diagnosis from sanitized error text | [Model diagnosis](#model-diagnosis) |
-| `--history`, `--history-file` | Adds selected shell history to diagnosis | [History input](#history-input) |
-| `--execute-fix` or `fix <command> [arguments...]` | Runs a user-entered command after preview and confirmation | [Sandboxed fix execution](#sandboxed-fix-execution) |
-| `errdoc --config-init` | Creates the user configuration file | [Configuration](#configuration) |
-
-### Command analysis
+Try errdoc:
 
 ```sh
 errdoc python -c "import missing_module"
 ```
 
-errdoc starts the command directly as an argument vector. It does not enable shell expansion, pipes, redirects, or shell operators inside that command. Use a shell pipeline piped into errdoc when you need shell syntax. Command timeouts are capped at 600 seconds, and errdoc terminates the command process tree so child processes cannot keep output pipes open. Captured output retains the newest 512 KiB per stream and marks omitted earlier output.
+The command should fail on purpose. errdoc then explains the error. The first Ollama request can take longer while the model starts.
 
-### Log and pipe input
+## Choose a tool
+
+Use the link for the task you have. Each option has its own example and explanation.
+
+| I want to… | Use this | Guide |
+| --- | --- | --- |
+| Explain a command that failed | `errdoc <command> [arguments]` | [Run a command](#run-a-command) |
+| Explain a saved log | `errdoc --file error.log` | [Read a log file](#read-a-log-file) |
+| Explain output from another command | Connect its output to errdoc | [Use a pipe](#use-a-pipe) |
+| Avoid contacting an AI model | `errdoc --no-llm <command>` | [Use offline rules](#use-offline-rules) |
+| Include selected shell history | `--history` or `--history-file` | [Include shell history](#include-shell-history) |
+| Try a command in an isolated copy | `errdoc --execute-fix <command>` or `fix <command>` | [Review a fix preview](#safe-fix-preview) |
+| Create or change settings | `errdoc --config-init` or `~/.errdoc/config.json` | [Set up a model](#set-up-a-model) |
+
+### Run a command
+
+```sh
+errdoc python -m pytest
+```
+
+errdoc runs the command you provide and explains its output if it fails. It does not interpret shell operators inside the command. If you need pipes, use your shell to connect the output to errdoc; see [Use a pipe](#use-a-pipe).
+
+Use `--timeout SECONDS` before the command to change the wait limit. The default is 120 seconds; the maximum is 600 seconds.
+
+### Read a log file
 
 ```sh
 errdoc --file error.log
-some-command 2>&1 | errdoc
 ```
 
-File input retains the newest 2 MiB; piped input retains the newest 1,000,000 characters. Each input limit marks omitted earlier content. Review and redact logs before sharing them with a remote model provider; see [Privacy and data flow](#privacy-and-data-flow).
+The newest 2 MiB of the file are kept. Earlier text is left out and marked as omitted.
 
-### Offline diagnosis
+### Use a pipe
 
 ```sh
-errdoc --no-llm python -c "import missing_module"
+python -m pytest 2>&1 | errdoc
 ```
 
-This option uses errdoc's local diagnosis rules and does not contact an LLM endpoint. It is useful for predictable, common errors or environments where model access is unavailable. The rule set covers selected error patterns; it does not replace a full debugger or guarantee a diagnosis for every failure.
+The newest 1,000,000 characters are kept. Review a log before sending it to a remote model; automatic secret hiding is not perfect.
 
-### Model diagnosis
+### Use offline rules
 
-errdoc can send sanitized error text and limited context to local Ollama or a configured OpenAI-compatible endpoint. The project snapshot used for sandboxed fixes is not sent to the diagnosis model. See [Local Ollama](#local-ollama), [OpenAI-compatible endpoint](#openai-compatible-endpoint), [Configuration](#configuration), and [Privacy and data flow](#privacy-and-data-flow) for setup and limits.
+```sh
+errdoc --no-llm python -m pytest
+```
 
-### History input
+This uses errdoc's built-in rules and does not contact a model service. It only recognizes selected errors, so it may not explain every failure.
 
-Use `--history` to include the selected shell history for a command, or `--history-file` to analyze a chosen history file. History is opt-in and passes through the same log sanitizer. Review the resulting input for sensitive values; redaction is heuristic.
+### Include shell history
 
-## Sandboxed fix execution
+History is optional. Add `--history` to include recent history, or `--history-file PATH` to choose a history file. Review it first: history can contain private commands, paths, or tokens. It passes through the same best-effort sanitizer as other text.
+
+## Set up a model
+
+### Use Ollama on your computer
+
+Install Ollama using its [official instructions](https://ollama.com/download), start it, and download a model such as `llama3.2`:
+
+```sh
+ollama pull llama3.2
+```
+
+By default, errdoc connects to Ollama at `http://localhost:11434`. The model runs on your computer. Downloading the model is a separate step; errdoc does not download it for you.
+
+### Use an OpenAI-compatible service
+
+Set `provider`, `base_url`, and `model` in `~/.errdoc/config.json`, or use the matching `ERRDOC_*` environment variables. Put your API key in a protected environment variable such as `ERRDOC_API_KEY`; do not put it in a command, shell history, or a file you commit.
+
+When you use a remote service, errdoc sends sanitized error text and limited system context to that service. Check that provider's privacy terms before connecting.
+
+### Change settings
+
+Run `errdoc --config-init` to create the starter configuration file. Environment variables override values in that file. Supported settings and limits are listed in [Configuration details](#configuration-details).
+
+#### Configuration details
+
+| Setting | Default | What it controls |
+| --- | --- | --- |
+| `ERRDOC_PROVIDER` | `ollama` | `ollama` or `openai` |
+| `ERRDOC_MODEL` | `llama3.2` | Model name used by the provider |
+| `ERRDOC_BASE_URL` | `http://localhost:11434` | Provider address |
+| `ERRDOC_API_KEY` | none | API key for a remote provider |
+| `ERRDOC_TIMEOUT` | `180` | Model request timeout in seconds |
+| `ERRDOC_MAX_INPUT_CHARS` | `12000` | Maximum text sent to the model (up to 1,000,000) |
+| `ERRDOC_MAX_OUTPUT_TOKENS` | `256` | Maximum response size (64–4096) |
+| `ERRDOC_CONFIG` | `~/.errdoc/config.json` | Alternate settings-file location |
+
+## Privacy in plain words
+
+- For an AI explanation, errdoc sends the error text and a small amount of context to the provider you selected.
+- Local Ollama keeps that request on your computer. A remote provider receives it over the network.
+- The project files prepared for the optional fix runner are **not** sent to the diagnosis model.
+- errdoc tries to hide common passwords, API keys, IP addresses, and personal home-folder paths. This is a best-effort filter, not a guarantee. A secret inside a normal source file or an unfamiliar format may not be found.
+- Review logs and history before sending them, especially to a remote provider.
+- A remote provider can see the connection's source IP. Redacting text does not hide network information.
+
+See [SECURITY.md](SECURITY.md) for private vulnerability reporting.
+
+## Safe fix preview
+
+The optional fix runner is for a command **you type yourself**. It does not run commands suggested by a model.
 
 ```sh
 errdoc --execute-fix <command> [arguments...]
+```
+
+or:
+
+```sh
 fix <command> [arguments...]
 ```
 
-The proposed command must be entered by the user. errdoc then creates a local JSON preview manifest listing included paths and sizes and excluded paths with filter reasons, and asks for a separate yes/no confirmation. It shows the first 100 included paths and summary counts; inspect the full manifest under `.errdoc` and review the project files before approving. The run uses the exact archived bytes shown in that preview, so later edits do not silently change the reviewed snapshot. Model output is never forwarded to the executor.
+Before asking for your confirmation, errdoc creates a preview manifest with the paths and sizes it plans to include and the reasons other paths are excluded. It displays the first 100 included paths and summary counts. Open the full manifest under `.errdoc` and inspect the listed files before answering yes. The run uses those exact previewed bytes.
 
-After confirmation, errdoc runs the command in a disposable Linux Docker or Podman container. It never falls back to host execution. The default image is `python:3.11-slim` and must already exist locally; errdoc does not download images. Set `ERRDOC_SANDBOX_IMAGE` to another local image, such as a Node.js image, when required. Network access is disabled, so the command cannot download packages during execution.
+### What goes into the temporary copy
 
-Snapshot limits are 64 MiB of regular-file content, 10,000 files, 20,000 filesystem entries, and 16,384 command characters. errdoc does not bind-mount the project, home directory, credentials, or Docker socket. The snapshot is passed through standard input to a temporary writable filesystem and discarded afterward. The container also uses a read-only root, an unprivileged user, dropped Linux capabilities, and CPU, memory, process, file-size, open-file, and time limits. errdoc removes the container on completion or timeout.
-
-### Snapshot preview and exclusions
-
-| Snapshot item | Handling |
+| Usually included | Excluded or rejected |
 | --- | --- |
-| Regular files in visible project directories | Included, within the size and count limits |
-| `.git`, virtual environments, `node_modules`, caches, `build`, `dist`, `.errdoc`, credential and secret directories | Excluded as directories |
-| Hidden directories | Excluded, except `.github` |
-| `.env*`, `.npmrc`, `.pypirc`, `.netrc`, SSH key names, and names containing secret/credential/password/token markers | Excluded by filename |
-| `.pem`, `.key`, `.p12`, `.pfx`, logs, database files, dumps, and backups | Excluded by extension |
-| Symlinks and Windows filesystem reparse points | Excluded; targets are not followed |
-| Non-regular files and unsafe archive paths | Excluded or rejected |
+| Regular files in visible project folders | `.git`, virtual environments, caches, build outputs, `dist`, and `.errdoc` |
+| `.github` files | Other hidden folders |
+| Files that fit the snapshot size and count limits | `.env*`, credential-named files, key files, logs, databases, dumps, backups |
+|  | Symlinks, Windows reparse points, special files, unsafe archive paths |
 
-The manifest records paths, sizes, and exclusion reasons, not file contents. A hidden file at the project root or a secret embedded in an ordinary source file may still be included. The filter checks names, directories, extensions, and links; it does not scan file contents for secrets. Inspect source files and the manifest before confirming. The destructive-command blacklist is an additional heuristic, not the security boundary. Container isolation depends on the host runtime and image; it reduces risk but cannot guarantee protection from every runtime vulnerability.
+The snapshot is limited to 64 MiB of file contents, 10,000 files, and 20,000 filesystem entries. The manifest lists names and sizes, not file contents. The filter does not inspect ordinary source files for secrets; a hidden file at the project root or a credential inside a regular source file may still be copied. Check the preview and inspect your files before confirming.
 
-## Configuration
+### Where the command runs
 
-Run `errdoc --config-init` to create `~/.errdoc/config.json`. Example:
+After confirmation, the command runs in a temporary Linux container using Docker or Podman. The container has no network, uses a read-only root and an unprivileged user, and is removed when the run ends. The project is copied into a temporary filesystem; it is not mounted back over your original project, so changes inside the container are discarded.
 
-```json
-{
-  "provider": "ollama",
-  "model": "llama3.2",
-  "base_url": "http://localhost:11434",
-  "api_key": null,
-  "timeout": 180,
-  "max_input_chars": 12000,
-  "max_output_tokens": 256
-}
-```
+You must already have a working Docker or Podman runtime and a local image. The default image is `python:3.11-slim`; errdoc does not download images automatically and does not fall back to running the command on your computer. Container isolation lowers risk, but cannot guarantee protection from every host or container-runtime vulnerability.
 
-Set `provider` to `openai` to use an OpenAI-compatible API. Configure `base_url`, `model`, and `api_key` as needed. Environment variables override matching JSON keys: `ERRDOC_PROVIDER`, `ERRDOC_MODEL`, `ERRDOC_BASE_URL`, `ERRDOC_API_KEY`, `ERRDOC_TIMEOUT`, `ERRDOC_MAX_INPUT_CHARS`, and `ERRDOC_MAX_OUTPUT_TOKENS`. LLM request timeouts are limited to 600 seconds and `max_input_chars` to 1,000,000. Responses are capped at 256 tokens by default and use a low temperature for repeatability; configure `max_output_tokens` between 64 and 4096 if needed. Response bodies are limited to 1 MiB regardless of the endpoint-reported content length. `ERRDOC_CONFIG` changes the configuration file location.
+## Common problems
 
-## Privacy and data flow
+| Problem | What to check |
+| --- | --- |
+| Ollama connection fails | Start Ollama and confirm the model is downloaded with `ollama list`. |
+| Remote model request fails | Check the provider URL, model name, API key, network, and timeout. |
+| `--execute-fix` cannot start | Start Docker or Podman and confirm the configured image exists locally. |
+| The explanation is wrong or vague | Treat it as a suggestion. Compare it with the original error and consult the tool's documentation. |
+| A fix command changes files | Changes happen in the temporary copy and are discarded; apply any useful change yourself after reviewing it. |
 
-When diagnosis uses an LLM, errdoc sends the sanitized error and limited context to the configured endpoint; it does not send the sandbox project snapshot. `detect_context()` includes only the operating system, OS release, Python version, and project marker names. It does not include the current directory, username, geographic location, or IP address.
+## Help and project status
 
-Before display and before an LLM request, errdoc redacts common credential assignments (including cloud secret-key fields), credentials in URLs, Basic/Bearer/Token authorization values, PEM private-key blocks, valid IPv4/IPv6 literals, the current home directory, and common Windows/macOS/Linux user-home paths. A four-part number explicitly labeled `Version=` is preserved so assembly version metadata remains useful. Redaction is heuristic: inspect logs before sharing and do not assume every secret or identifying path will be removed.
+errdoc is an early pre-release project. It is not a debugger and cannot promise a correct explanation for every error. The current prompt's 50 model-backed cases have an automatic evaluation, but they do not yet have current human ratings. Earlier human ratings belong to an older prompt and are not evidence for today's answers. See [QUALITY_GATES.md](QUALITY_GATES.md) for test results and release blockers.
 
-Redaction changes the text errdoc sends; it cannot hide the source network IP from GitHub or a remote model provider that receives the connection. Use local Ollama at `localhost` to keep diagnosis requests on the machine, or choose a remote service you trust. Generated diagnoses remain unverified. Model-generated commands and code are suppressed, and model output is never sent to the executor. Fix execution always requires separate confirmation and runs only in the disposable container described in [Sandboxed fix execution](#sandboxed-fix-execution).
+### Why isn't it rated 10/10 yet?
 
-## Development
+Passing tests shows that errdoc works in the tested situations. It does not prove that every AI explanation is correct or that every secret will be found. The 50 answers from the current model prompt still need human review; the automatic score checks words and patterns, not meaning. TestPyPI installation, PyPI name ownership, and a broader privacy review also remain unverified. Until those checks are complete, a perfect trust score would overstate the evidence.
+
+- [**Review the tests and release gates →**](QUALITY_GATES.md)
+- [**Report a security issue privately →**](SECURITY.md)
+- [**Contribute or run tests →**](CONTRIBUTING.md)
+- [**Review the model answers by hand →**](LLM_REVIEW_GUIDE.md)
+- [**See project changes →**](CHANGELOG.md)
+- [**Open a bug report →**](https://github.com/Mhdjamadi1994/errdoc-cli/issues/new/choose)
+
+If errdoc helps you, consider starring the repository. Stars are optional and do not replace bug reports or independent review.
+
+## Run tests
+
+From the repository folder:
 
 ```sh
 python -m pip install -e ".[test]"
 python -m pytest -q -m "not integration"
 ```
 
-The cross-platform unit suite excludes the integration marker, so it reports no skipped tests. Separate Linux CI jobs run the sandbox checks under Docker and Podman. To select a runtime locally, set `ERRDOC_CONTAINER_RUNTIME` to `docker` or `podman`; if unset, errdoc tries Docker and then Podman. The selected runtime must be running, and the configured sandbox image must already be available locally:
+The separate container tests require a running Docker or Podman installation and a local sandbox image:
 
 ```sh
 ERRDOC_RUN_SANDBOX_INTEGRATION=1 python -m pytest -m integration tests/test_executor_integration.py -q
 ```
 
-To force Podman on a system that also has Docker:
-
-```sh
-ERRDOC_CONTAINER_RUNTIME=podman ERRDOC_RUN_SANDBOX_INTEGRATION=1 python -m pytest -m integration tests/test_executor_integration.py -q
-```
-
-In Windows PowerShell:
-
-```powershell
-$env:ERRDOC_RUN_SANDBOX_INTEGRATION = "1"
-$env:ERRDOC_CONTAINER_RUNTIME = "docker" # or "podman"
-python -m pytest -m integration tests/test_executor_integration.py -q
-```
-
-To review diagnosis correctness by hand, use the interactive evaluation command in [LLM_REVIEW_GUIDE.md](LLM_REVIEW_GUIDE.md). Human ratings are required before making reliability claims.
-
-## Release readiness
-
-This is an active pre-release build; the PyPI package is not published. Commit `1f25922` passed all 18 GitHub Actions checks on October 22, 2026, including the platform/Python matrix, Docker, Podman, and dependency audit. See [QUALITY_GATES.md](QUALITY_GATES.md) for release criteria, evidence, and remaining work. Passing CI does not by itself establish diagnosis accuracy or complete release readiness.
-
-## Current scope
-
-Project detection covers Django, Node.js, Git, and Python markers. Shell history is only read when the --history option is used, and any included history is processed by the log sanitizer. Suggested-command execution requires Docker/Podman and an explicit confirmation. It operates on a temporary project snapshot and does not write changes back.
-
-## Continuous integration
-
-The configured GitHub Actions workflow tests Windows, Linux, and macOS on Python 3.10 through 3.14, builds and installs both wheel and source distributions, and runs Linux Docker/Podman sandbox checks. Run 39773246844 for commit `1f25922` passed all 18 checks on October 22, 2026. See the [Actions history](https://github.com/Mhdjamadi1994/errdoc-cli/actions/workflows/tests.yml) for live status.
+The hosted workflow checks Windows, Linux, and macOS with Python 3.10 through 3.14. Its live result is shown by the CI badge at the top of this page.
