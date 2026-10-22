@@ -112,7 +112,26 @@ _JAVA_CLASS_VERSION = re.compile(
 )
 _DISK_FULL = re.compile(r"No space left on device|\bDisk full\b", re.I)
 _JAVA_MISSING_CLASS = re.compile(r"(?:NoClassDefFoundError|ClassNotFoundException):\s*([\w/$.-]+)", re.I)
-_JAVA_CLASS_CAST = re.compile(r"ClassCastException:\s*class\s+([\w.$]+)\s+cannot be cast to class\s+([\w.$]+)", re.I)
+_JAVA_CLASS_CAST = re.compile(r"ClassCastException:\s*(?:class\s+)?([\w.$]+)\s+cannot be cast to (?:class\s+)?([\w.$]+)", re.I)
+_JAVA_NO_SUCH_METHOD = re.compile(
+    r"NoSuchMethodError:\s*(?:['\"]([^'\"]+)['\"]|([^\s]+))", re.I
+)
+_PY_EXTENSION_INIT_SYMBOL = re.compile(
+    r"ImportError:\s+([^\s:]+\.so):\s*undefined symbol:\s*PyInit_([A-Za-z0-9_]+)", re.I
+)
+_RUST_BORROW_CONFLICT = re.compile(
+    r"error\[E0502\]:\s*cannot borrow [`']?([A-Za-z_][A-Za-z0-9_]*)[`']? as mutable because it is also borrowed as immutable",
+    re.I,
+)
+_ASYNCIO_DIFFERENT_LOOP = re.compile(r"Future .*?attached to a different loop", re.I | re.S)
+_CMK_UNDEFINED_REFERENCE = re.compile(r"undefined reference to [`']([^`']+)[`']", re.I)
+_RUST_TRAIT_BOUND = re.compile(r"error\[E0277\]:\s*the trait bound [`']([^:]+):\s*([^`']+)[`'] is not satisfied", re.I)
+_HTTP_503_RETRY_AFTER = re.compile(r"HTTP(?:/\d(?:\.\d)?)?\s+503\s+Service Unavailable", re.I)
+_SQLALCHEMY_MISSING_GREENLET = re.compile(r"sqlalchemy\.exc\.MissingGreenlet:.*?greenlet_spawn has not been called;.*?await_only\(\).*?unexpected place", re.I | re.S)
+_NODE_EADDRNOTAVAIL = re.compile(r"\bEADDRNOTAVAIL\b", re.I)
+_GO_UNDEFINED = re.compile(r"(?m)^\s*\S+\.go:\d+:\d+:\s+undefined:\s+([A-Za-z_][A-Za-z0-9_]*)\s*$")
+_PHP_CLASS_NOT_FOUND = re.compile(r"Class\s+['\"]([^'\"]+)['\"]\s+not found", re.I)
+_REDIS_MAX_CLIENTS = re.compile(r"max number of clients reached", re.I)
 _DOTNET_ASSEMBLY_NOT_FOUND = re.compile(
     r"Could not load file or assembly\s+['\x22]([^,'\x22]+),\s*Version=([^,'\x22]+)",
     re.I,
@@ -241,6 +260,152 @@ def _known_diagnosis(error: str) -> str | None:
             "**Steps**\n\n"
             "1. Check the destination and output stream encoding used by the failing operation.\n"
             f"2. Use an encoding supported by that destination and verify how it handles characters outside {codec}."
+        )
+
+    java_cast = _JAVA_CLASS_CAST.search(error)
+    if java_cast:
+        source_type, target_type = java_cast.groups()
+        location = re.search(r"\bat\s+([\w.$]+\.java:\d+)\b", error)
+        where = f" at {location.group(1)}" if location else ""
+        return (
+            "**Diagnosis**\n"
+            f"Java could not cast the runtime value type {source_type} to {target_type}{where}. This is a type mismatch at the cast; it is not evidence of a missing method or dependency.\n\n"
+            "**Steps**\n\n"
+            "1. Inspect the value and cast at the reported location.\n"
+            "2. Check the code or data contract that determines the value's runtime type before converting it."
+        )
+
+    java_method = _JAVA_NO_SUCH_METHOD.search(error)
+    if java_method:
+        method = java_method.group(1) or java_method.group(2)
+        return (
+            "**Diagnosis**\n"
+            f"The JVM could not link the expected method signature {method}: the class loaded at runtime does not provide it. This points to a class or dependency mismatch, not a Java language-version problem.\n\n"
+            "**Steps**\n\n"
+            "1. Check the runtime classpath for duplicate or mismatched versions of the class's dependency.\n"
+            "2. Compare the caller's expected method signature with the class actually packaged for deployment."
+        )
+
+    native_init = _PY_EXTENSION_INIT_SYMBOL.search(error)
+    if native_init:
+        binary, symbol = native_init.groups()
+        return (
+            "**Diagnosis**\n"
+            f"Python found the native extension {binary}, but the shared library does not export its required initializer PyInit_{symbol}. The error does not identify whether the module name or built artifact is mismatched.\n\n"
+            "**Steps**\n\n"
+            "1. Compare the extension's import name with the initializer exported by the build.\n"
+            "2. Verify that the installed binary was built for this module and Python ABI."
+        )
+
+    borrow = _RUST_BORROW_CONFLICT.search(error)
+    if borrow:
+        name = borrow.group(1)
+        line = re.search(r"(?m)^\s*(\d+):\s*.*\b(?:push|insert|extend)\s*\(", error)
+        location = f" at line {line.group(1)}" if line else ""
+        return (
+            "**Diagnosis**\n"
+            f"Rust error E0502 means {name} is mutably borrowed while an immutable borrow is still live{location}. The excerpt shows a borrow-checking conflict, not a data race.\n\n"
+            "**Steps**\n\n"
+            "1. Check where the immutable borrow is last used and shorten its lifetime.\n"
+            "2. Restructure the access so the immutable and mutable borrows do not overlap."
+        )
+
+    if _ASYNCIO_DIFFERENT_LOOP.search(error):
+        return (
+            "**Diagnosis**\n"
+            "RuntimeError: Asyncio tried to use a Future with an event loop different from the one to which it is attached. This is an event loop ownership mismatch.\n\n"
+            "**Steps**\n\n"
+            "1. Trace where the Future is created and confirm it is awaited by its owning loop.\n"
+            "2. Check whether a loop-bound client or task is reused across separate event loops."
+        )
+
+    undefined_ref = _CMK_UNDEFINED_REFERENCE.search(error)
+    if undefined_ref:
+        symbol = undefined_ref.group(1)
+        return (
+            "**Diagnosis**\n"
+            f"The linker could not find a definition for {symbol}. Compilation reached the link stage, but the object or library that should define this symbol was not linked or does not provide the expected signature.\n\n"
+            "**Steps**\n\n"
+            "1. Check that the implementation of the exact symbol is part of the build.\n"
+            "2. Verify the target links the library or object containing that definition."
+        )
+
+    rust_trait = _RUST_TRAIT_BOUND.search(error)
+    if rust_trait:
+        type_name, trait = (part.strip() for part in rust_trait.groups())
+        return (
+            "**Diagnosis**\n"
+            f"Rust reports that {type_name} does not implement the required trait {trait}. The diagnostic says this trait is required by the operation at the reported source location.\n\n"
+            "**Steps**\n\n"
+            f"1. Check which formatting or API operation requires {trait}.\n"
+            f"2. Implement the trait for {type_name} or use an operation supported by its existing traits."
+        )
+
+    if _HTTP_503_RETRY_AFTER.search(error):
+        retry = re.search(r"(?im)^Retry-After:\s*(\d+)\s*$", error)
+        seconds = retry.group(1) if retry else None
+        wait = f" The Retry-After header asks the client to wait {seconds} seconds before another request; it does not guarantee recovery by then." if seconds else " The response does not establish when the service will recover."
+        return (
+            "**Diagnosis**\n"
+            "The endpoint returned HTTP 503 Service Unavailable, indicating that it could not handle the request at that time."
+            f"{wait}\n\n"
+            "**Steps**\n\n"
+            "1. Check the service health and the response at the reported endpoint.\n"
+            "2. Ensure the client uses bounded backoff and honors the server's Retry-After guidance."
+        )
+
+    if _SQLALCHEMY_MISSING_GREENLET.search(error):
+        return (
+            "**Diagnosis**\n"
+            "SQLAlchemy attempted async database I/O where its greenlet context was not active. This commonly occurs when lazy loading or attribute access triggers I/O outside the async session's awaited context.\n\n"
+            "**Steps**\n\n"
+            "1. Check which attribute access or ORM operation triggered the I/O.\n"
+            "2. Load the needed data within the active async session or use the documented awaitable access pattern."
+        )
+
+    if _NODE_EADDRNOTAVAIL.search(error):
+        local = re.search(r"Local\s+\(([^)]+)\)", error)
+        detail = f" The logged local socket endpoint is {local.group(1)}." if local else ""
+        return (
+            "**Diagnosis**\n"
+            "EADDRNOTAVAIL means the operating system could not allocate or use the requested local socket address for this connection. The error alone does not show that the remote server is down."
+            f"{detail}\n\n"
+            "**Steps**\n\n"
+            "1. Check the local interface or source-address configuration used by the client.\n"
+            "2. Review local socket and ephemeral-port availability at the time of failure."
+        )
+
+    go_undefined = _GO_UNDEFINED.search(error)
+    if go_undefined:
+        name = go_undefined.group(1)
+        line = re.search(r"(?m)^\s*(\S+\.go:\d+:\d+):\s+undefined:", error)
+        location = f" at {line.group(1)}" if line else ""
+        return (
+            "**Diagnosis**\n"
+            f"The Go compiler cannot resolve the identifier {name}{location}. The message alone does not establish whether it is misspelled, out of scope, excluded by build constraints, or declared in another package.\n\n"
+            "**Steps**\n\n"
+            "1. Check the declaration and spelling in the active package and build configuration.\n"
+            "2. If it belongs to another package, verify the import and exported identifier."
+        )
+
+    php_class = _PHP_CLASS_NOT_FOUND.search(error)
+    if php_class:
+        name = php_class.group(1)
+        return (
+            "**Diagnosis**\n"
+            f"PHP could not resolve class {name}. The error does not distinguish a missing autoload mapping from a namespace, class-name, or file-case mismatch.\n\n"
+            "**Steps**\n\n"
+            "1. Compare the class namespace and name with its file and Composer autoload mapping.\n"
+            "2. Check that the deployed autoloader includes the class's source directory."
+        )
+
+    if _REDIS_MAX_CLIENTS.search(error):
+        return (
+            "**Diagnosis**\n"
+            "Redis reports a max number of clients reached error and refused a new connection. The configured client limit has been reached, but the message alone does not show whether connections are leaking or the limit is too low.\n\n"
+            "**Steps**\n\n"
+            "1. Review active and idle Redis client connections and the application's connection-pool behavior.\n"
+            "2. Check for clients that are not being returned or closed before considering a capacity change."
         )
 
     pickle_local = _PYTHON_PICKLE_LOCAL.search(error)

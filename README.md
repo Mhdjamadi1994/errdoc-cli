@@ -210,11 +210,11 @@ You must already have a working Docker or Podman runtime and a local image. The 
 
 ## Help and project status
 
-errdoc is an early pre-release project. It is not a debugger and cannot promise a correct explanation for every error. A human reviewed all 51 saved answers from the current model prompt: the mean score was 9.39/10, but only 1 of 51 was labeled fully correct; the other 50 were labeled partially correct. The beta gate therefore fails. One unsupported claim and one answer over 120 words also remain. See the [trust assessment](docs/trust-assessment-2026-10-22.md) and [quality gates](QUALITY_GATES.md) for the evidence and remaining release blockers.
+errdoc is an early pre-release project. It is not a debugger and cannot promise a correct explanation for every error. The October 22 baseline review scored 51 model answers at 9.39/10 on average, but only 1 was labeled fully correct; the other 50 were partially correct. We have since added deterministic diagnoses for several concrete failure modes and expanded the test corpus. Those changes need a fresh model evaluation and human review, so the baseline score is not a score for the updated code. See the [trust assessment](docs/trust-assessment-2026-10-22.md) and [quality gates](QUALITY_GATES.md) for evidence and release blockers.
 
 ### Why isn't it rated 10/10 yet?
 
-Passing tests shows that errdoc works in the tested situations. It does not prove that every AI explanation is correct or that every secret will be found. Human review of the current 51 answers is complete, but only one was labeled fully correct; the automatic report also flags one unsupported claim and one overlong answer. TestPyPI installation, PyPI name ownership, and a broader privacy review remain unverified. The [trust assessment](docs/trust-assessment-2026-10-22.md) explains the 5/10 readiness score and evidence; the automatic score checks words and patterns, not meaning.
+Passing tests shows that errdoc works in the tested situations. It does not prove that every AI explanation is correct or that every secret will be found. The pre-fix baseline's human review and automatic flags remain useful historical evidence, but they do not validate the updated diagnostic routes. TestPyPI installation, PyPI name ownership, and a broader privacy review also remain unverified. The [trust assessment](docs/trust-assessment-2026-10-22.md) separates baseline results from the updated build; automatic checks look for patterns and cannot prove meaning.
 
 - [**Review the tests and release gates →**](QUALITY_GATES.md)
 - [**Report a security issue privately →**](SECURITY.md)

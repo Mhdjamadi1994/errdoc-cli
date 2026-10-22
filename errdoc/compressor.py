@@ -54,6 +54,14 @@ def sanitize(text: str) -> str:
 
     def redact_ip(match: re.Match[str]) -> str:
         candidate = match.group(0).split("%", 1)[0]
+        if match.re is _IPV6_CANDIDATE:
+            # Namespace and method separators can contain valid-looking IPv6
+            # fragments (for example, `std::fmt::Display` contains `d::f`).
+            # Do not redact a fragment embedded in an identifier.
+            left = text[match.start() - 1] if match.start() else ""
+            right = text[match.end()] if match.end() < len(text) else ""
+            if left.isalnum() or left == "_" or right.isalnum() or right == "_":
+                return match.group(0)
         # Four-part assembly versions look exactly like IPv4 literals. Preserve
         # them only when explicitly labeled as versions so diagnostics retain
         # useful metadata without broadly weakening address redaction.

@@ -48,11 +48,21 @@ python scripts\evaluate_llm.py --llm-only --review-existing .errdoc\llm-automati
 
 The corpus currently contains 51 LLM-backed fixtures. The first command asks the local model to answer them and saves a local automatic report. The offline review reads saved answers without making model requests and shows the original raw answer and the separately filtered answer errdoc would display. Review and score the raw answer, including any command or code it proposes; never copy or execute model output. The evaluator recomputes automatic flags from the raw answer. If interrupted, resume with `--resume`, keeping the same source report, reviewer label, and output path. Reports and checkpoints stay under `.errdoc`; do not commit them. The release gate remains `NOT MET` until at least 50 ratings for the exact current model/prompt exist and every threshold passes.
 
-### Current human review (October 22, 2026)
+### Pre-fix baseline review (October 22, 2026)
 
-The 51 saved answers for the current `llama3.2` prompt have been reviewed and recorded locally in `.errdoc\llm-human-review-2026-10-22.json`. The mean numeric score is 9.39/10, but the separate class counts are 1 `correct`, 50 `partially-correct`, 0 `incorrect`, and 0 `unsafe`. The exact-correct rate is 1/51 (1.96%), so this review does **not** pass the 90% beta gate. Also, one automatic unsupported-claim flag and one over-120-word answer remain. Do not interpret the high numeric mean as a reliability pass or change entered labels just to make the gate pass.
+The 51 saved answers in the pre-fix `llama3.2` baseline were reviewed and recorded locally in `.errdoc\llm-human-review-2026-10-22.json`. The mean numeric score is 9.39/10, but the separate class counts are 1 `correct`, 50 `partially-correct`, 0 `incorrect`, and 0 `unsafe`. The exact-correct rate is 1/51 (1.96%), so that review did **not** pass the 90% beta gate. It also had one automatic unsupported-claim flag and one over-120-word answer. The sanitized human-entered scores and classifications are preserved in [the public score-only CSV](docs/llm-human-review-2026-10-22.csv); raw answers remain local. Do not interpret the high numeric mean as a reliability pass or change entered labels just to make the gate pass.
 
-The full report is local and must not be committed because it contains raw model answers. The aggregate assessment and release blockers are documented in [the trust assessment](docs/trust-assessment-2026-10-22.md). If the prompt, model, filtering, or response behavior changes, generate a new automatic report and review that exact output; these ratings cannot be transferred.
+The current worktree adds deterministic handling for reviewed failure patterns and expands the corpus to 123 cases while preserving 51 model-backed cases. A fresh evaluation of those 51 model-backed cases is in progress at `.errdoc\llm-automatic-post-diagnostics-2026-10-22.json`. Once it completes, review that exact output to assess the updated model set; the baseline ratings cannot be transferred. The full raw report stays local. The aggregate assessment and release blockers are documented in [the trust assessment](docs/trust-assessment-2026-10-22.md).
+
+After the automatic report says it saved the complete 51-case file, start its human review from Command Prompt with:
+
+```cmd
+cd /d D:\errdoc
+.venv\Scripts\activate.bat
+python scripts\evaluate_llm.py --llm-only --review-existing .errdoc\llm-automatic-post-diagnostics-2026-10-22.json --reviewer Mhdjamadi1994 --output .errdoc\llm-human-review-post-diagnostics-2026-10-22.json
+```
+
+The exported result will only be eligible for public release after its accuracy and automatic safety gates pass. The raw report should stay local; publish only a score-only CSV after verifying every row against the completed human report.
 
 For every case, record one review class:
 

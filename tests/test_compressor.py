@@ -59,6 +59,14 @@ def test_sanitize_redacts_ipv4_and_ipv6_addresses(address):
 
 
 @pytest.mark.parametrize(
+    "symbol",
+    ["std::fmt::Display", "TelemetryClient::flush()", "Counter::increment", "foo::bar::Baz"],
+)
+def test_sanitize_preserves_namespaced_symbols_that_contain_ipv6_like_fragments(symbol):
+    assert sanitize(symbol) == symbol
+
+
+@pytest.mark.parametrize(
     "path",
     [r"C:\\Users\\alice\\project\\app.py", "/home/alice/project/app.py", "/Users/alice/project/app.py"],
 )

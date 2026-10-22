@@ -1413,17 +1413,9 @@
     "project": "Node.js",
     "error": "Error: connect EADDRNOTAVAIL 192.0.2.10:443 - Local (0.0.0.0:0)",
     "fact_groups": [
-      [
-        "EADDRNOTAVAIL"
-      ],
-      [
-        "192.0.2.10:443"
-      ],
-      [
-        "local address",
-        "network interface",
-        "available local address"
-      ]
+      ["EADDRNOTAVAIL"],
+      ["local socket address", "local address"],
+      ["network interface", "available local address", "ephemeral-port"]
     ]
   },
   {
@@ -1502,5 +1494,117 @@
         "required trait"
       ]
     ]
+  },
+  {
+    "id": "extended_git_merge_conflict",
+    "project": "Git",
+    "error": "Auto-merging src/invoice.py\nCONFLICT (content): Merge conflict in src/invoice.py\nAutomatic merge failed; fix conflicts and then commit the result.",
+    "fact_groups": [["CONFLICT (content)", "Automatic merge failed"], ["src/invoice.py"], ["conflict markers", "merge result", "resolve"]],
+    "must_not_contain": ["git reset --hard", "discard local changes"]
+  },
+  {
+    "id": "extended_typescript_type_mismatch",
+    "project": "TypeScript",
+    "error": "src/billing.ts(28,7): error TS2322: Type 'string' is not assignable to type 'number'.",
+    "fact_groups": [["TS2322", "not assignable"], ["string", "number"], ["src/billing.ts", "type annotation", "conversion"]],
+    "must_not_contain": ["cast every value", "disable strict mode"]
+  },
+  {
+    "id": "extended_k8s_missing_secret_key",
+    "project": "Kubernetes",
+    "error": "Error: container api failed to start\nReason: CreateContainerConfigError\nMessage: couldn't find key API_TOKEN in Secret api-credentials",
+    "fact_groups": [["CreateContainerConfigError", "failed to start"], ["API_TOKEN", "key"], ["Secret api-credentials", "secret"]],
+    "must_not_contain": ["print the secret", "recreate all secrets"]
+  },
+  {
+    "id": "extended_postgres_undefined_column",
+    "project": "PostgreSQL",
+    "error": "psycopg.errors.UndefinedColumn: column invoices.external_ref does not exist\nLINE 1: SELECT invoices.external_ref FROM invoices",
+    "fact_groups": [["UndefinedColumn", "does not exist"], ["invoices.external_ref"], ["schema", "migration", "query"]],
+    "must_not_contain": ["drop the column", "run every migration"]
+  },
+  {
+    "id": "extended_maven_invalid_target_release",
+    "project": "Java/Maven",
+    "error": "[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile: Fatal error compiling: error: invalid target release: 21",
+    "fact_groups": [["invalid target release", "Fatal error compiling"], ["21"], ["compiler JDK", "toolchain", "supported release"]],
+    "must_not_contain": ["change the source code", "install Java 21 immediately"]
+  },
+  {
+    "id": "extended_node_module_not_found_esm",
+    "project": "Node.js",
+    "error": "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'billing-core' imported from /srv/app/src/charge.mjs",
+    "fact_groups": [["ERR_MODULE_NOT_FOUND", "Cannot find package"], ["billing-core"], ["charge.mjs", "module resolution", "package exports"]],
+    "must_not_contain": ["npm install billing-core", "the package is definitely unpublished"]
+  },
+  {
+    "id": "extended_rust_use_after_move",
+    "project": "Rust",
+    "error": "error[E0382]: borrow of moved value: `invoice`\n --> src/submit.rs:44:18\n  | value moved here at line 39",
+    "fact_groups": [["E0382", "borrow of moved value"], ["invoice", "moved"], ["src/submit.rs:44", "ownership", "borrow"]],
+    "must_not_contain": ["data race", "use unsafe"]
+  },
+  {
+    "id": "extended_php_undefined_method",
+    "project": "PHP",
+    "error": "PHP Fatal error: Uncaught Error: Call to undefined method App\\Billing\\Invoice::finalize() in /srv/app/src/Controller.php:81",
+    "fact_groups": [["undefined method", "Call to undefined method"], ["Invoice::finalize", "finalize()"], ["Controller.php:81", "class definition", "method name"]],
+    "must_not_contain": ["reinstall PHP", "disable error reporting"]
+  },
+  {
+    "id": "extended_docker_exec_format",
+    "project": "Docker",
+    "error": "standard_init_linux.go: exec user process caused: exec format error\nContainer: worker",
+    "fact_groups": [["exec format error", "exec user process"], ["worker"], ["architecture", "entrypoint", "file format"]],
+    "must_not_contain": ["delete the image", "run as privileged"]
+  },
+  {
+    "id": "extended_python_dictionary_mutation_iteration",
+    "project": "Python",
+    "error": "RuntimeError: dictionary changed size during iteration\n at config_loader.py:66 in merge_defaults",
+    "fact_groups": [["dictionary changed size", "RuntimeError"], ["iteration", "during iteration"], ["config_loader.py:66", "mutation", "separate collection"]],
+    "must_not_contain": ["increase recursion limit", "thread race"]
+  },
+  {
+    "id": "extended_http_413_payload_too_large",
+    "project": "HTTP/API",
+    "error": "HTTPError: 413 Request Entity Too Large\nPOST https://api.example.invalid/v2/import\nContent-Length: 73400320",
+    "fact_groups": [["413", "Request Entity Too Large"], ["api.example.invalid/v2/import"], ["Content-Length", "payload", "server request limit"]],
+    "must_not_contain": ["increase the limit to unlimited", "disable request validation"]
+  },
+  {
+    "id": "extended_go_type_mismatch",
+    "project": "Go",
+    "error": "./invoice.go:52:16: cannot use amount (variable of type int64) as string value in argument to FormatCurrency",
+    "fact_groups": [["cannot use", "type mismatch"], ["int64", "string"], ["FormatCurrency", "invoice.go:52", "conversion"]],
+    "must_not_contain": ["change every amount to string", "ignore the compiler error"]
+  },
+  {
+    "id": "extended_npm_engine_incompatible",
+    "project": "Node.js/npm",
+    "error": "npm ERR! code EBADENGINE\nnpm ERR! engine Unsupported engine\nnpm ERR! required: { node: '>=22' }\nnpm ERR! current: { node: '20.11.1' }",
+    "fact_groups": [["EBADENGINE", "Unsupported engine"], ["required", ">=22"], ["current", "20.11.1", "Node.js version"]],
+    "must_not_contain": ["force install", "ignore-scripts"]
+  },
+  {
+    "id": "extended_k8s_forbidden_service_account",
+    "project": "Kubernetes",
+    "error": "Error from server (Forbidden): pods is forbidden: User 'system:serviceaccount:reports:worker' cannot list resource 'pods' in API group '' in the namespace 'reports'",
+    "fact_groups": [["Forbidden", "forbidden"], ["serviceaccount:reports:worker", "worker"], ["cannot list resource 'pods'", "namespace 'reports'", "RBAC"]],
+    "must_not_contain": ["cluster-admin", "grant all permissions"]
+  },
+  {
+    "id": "extended_postgres_deadline_timeout",
+    "project": "PostgreSQL",
+    "error": "psycopg.OperationalError: canceling statement due to statement timeout\nQuery duration: 15s",
+    "fact_groups": [["statement timeout", "canceling statement"], ["15s", "duration"], ["query execution", "configured timeout", "database load"]],
+    "must_not_contain": ["deadlock detected", "increase timeout without checking query"]
+  },
+  {
+    "id": "extended_gradle_variant_resolution",
+    "project": "Java/Gradle",
+    "error": "Could not resolve project :billing. No matching variant of project :billing was found. The consumer needed a runtime library for Java 21, but the producer declares a Java 17 target.",
+    "fact_groups": [["No matching variant", "Could not resolve project"], ["Java 21", "Java 17"], ["consumer", "producer", "variant attributes"]],
+    "must_not_contain": ["delete Gradle cache", "change Java source level blindly"]
   }
 ]

@@ -101,6 +101,84 @@ def test_additional_reviewed_diagnostics_are_deterministic(error, expected, forb
     assert needs_llm(error) is False
 
 
+@pytest.mark.parametrize(
+    ("error", "expected", "forbidden"),
+    [
+        (
+            "java.lang.ClassCastException: java.lang.Long cannot be cast to java.lang.Integer at Counter.java:57",
+            "could not cast the runtime value type java.lang.Long to java.lang.Integer",
+            "runtime binary linkage incompatibility",
+        ),
+        (
+            "Exception in thread \"main\" java.lang.NoSuchMethodError: 'void com.example.billing.InvoiceGateway.charge(java.lang.String)'",
+            "InvoiceGateway.charge(java.lang.String)",
+            "UnsupportedClassVersionError",
+        ),
+        (
+            "ImportError: /opt/app/venv/lib/python3.14/site-packages/sample_ext.cpython-314-x86_64-linux-gnu.so: undefined symbol: PyInit_sample_ext",
+            "does not export its required initializer PyInit_sample_ext",
+            "loaded class",
+        ),
+        (
+            "error[E0502]: cannot borrow `items` as mutable because it is also borrowed as immutable\n --> src/selection.rs:28:5\n27 | let first = &items[0];\n28 | items.push(value);\n29 | println!(\"{first}\");",
+            "not a data race",
+            "concurrent modification",
+        ),
+        (
+            "RuntimeError: Task <Task pending> got Future <Future pending> attached to a different loop",
+            "event loop different from the one to which it is attached",
+            "concurrent access",
+        ),
+        (
+            "undefined reference to `TelemetryClient::flush()`\ncollect2: error: ld returned 1 exit status",
+            "TelemetryClient::flush()",
+            "method `lush()`",
+        ),
+        (
+            "error[E0277]: the trait bound `Widget: std::fmt::Display` is not satisfied\nrequired by this formatting parameter",
+            "Widget does not implement the required trait std::fmt::Display",
+            "version mismatch",
+        ),
+        (
+            "HTTP/1.1 503 Service Unavailable\nRetry-After: 45\nEndpoint: https://api.example.invalid/v1/inventory",
+            "does not guarantee recovery by then",
+            "will become available again after 45 seconds",
+        ),
+        (
+            "sqlalchemy.exc.MissingGreenlet: greenlet_spawn has not been called; can't call await_only() here. Was IO attempted in an unexpected place?",
+            "greenlet context was not active",
+            "has not been called before attempting to call await_only()",
+        ),
+        (
+            "Error: connect EADDRNOTAVAIL 192.0.2.10:443 - Local (0.0.0.0:0)",
+            "does not show that the remote server is down",
+            "server is not available at the specified IP address",
+        ),
+        (
+            "./handler.go:42:9: undefined: NewReportClient",
+            "cannot resolve the identifier NewReportClient",
+            "report package is not properly imported",
+        ),
+        (
+            'PHP Fatal error: Uncaught Error: Class "App\\\\Reports\\\\PdfRenderer" not found in /srv/app/src/Reports/ExportController.php:42',
+            "could not resolve class App",
+            "missing or incorrect namespace declaration",
+        ),
+        (
+            "redis.exceptions.ResponseError: max number of clients reached",
+            "configured client limit has been reached",
+            "increase the server limit",
+        ),
+    ],
+)
+def test_low_scoring_llm_diagnoses_have_specific_deterministic_fallbacks(error, expected, forbidden):
+    result = diagnose(error, {}, Config(provider="ollama", model="unused", base_url="http://127.0.0.1:1"))
+
+    assert expected.casefold() in result.casefold()
+    assert forbidden.casefold() not in result.casefold()
+    assert needs_llm(error) is False
+
+
 def test_inline_bundle_command_is_removed_from_model_response():
     cleaned, removed = sanitize_model_response("Run `bundle config set --local platform x86_64-linux` to fix it.")
     assert removed is True
