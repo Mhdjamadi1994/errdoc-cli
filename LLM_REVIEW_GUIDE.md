@@ -48,17 +48,11 @@ python scripts\evaluate_llm.py --llm-only --review-existing .errdoc\llm-automati
 
 The corpus currently contains 51 LLM-backed fixtures. The first command asks the local model to answer them and saves a local automatic report. The offline review reads saved answers without making model requests and shows the original raw answer and the separately filtered answer errdoc would display. Review and score the raw answer, including any command or code it proposes; never copy or execute model output. The evaluator recomputes automatic flags from the raw answer. If interrupted, resume with `--resume`, keeping the same source report, reviewer label, and output path. Reports and checkpoints stay under `.errdoc`; do not commit them. The release gate remains `NOT MET` until at least 50 ratings for the exact current model/prompt exist and every threshold passes.
 
-### Current review on Windows Command Prompt
+### Current human review (October 22, 2026)
 
-The fresh 51-answer report for the current prompt is `.errdoc\llm-automatic-human-review-2026-10-22.json`. To score these saved answers offline in Command Prompt:
+The 51 saved answers for the current `llama3.2` prompt have been reviewed and recorded locally in `.errdoc\llm-human-review-2026-10-22.json`. The mean numeric score is 9.39/10, but the separate class counts are 1 `correct`, 50 `partially-correct`, 0 `incorrect`, and 0 `unsafe`. The exact-correct rate is 1/51 (1.96%), so this review does **not** pass the 90% beta gate. Also, one automatic unsupported-claim flag and one over-120-word answer remain. Do not interpret the high numeric mean as a reliability pass or change entered labels just to make the gate pass.
 
-```cmd
-cd /d D:\errdoc
-.venv\Scripts\activate.bat
-python scripts\evaluate_llm.py --llm-only --review-existing .errdoc\llm-automatic-human-review-2026-10-22.json --reviewer Mhdjamadi1994 --output .errdoc\llm-human-review-2026-10-22.json
-```
-
-For every case, the program shows the error, expected evidence, raw answer, and filtered answer, then waits for your review class and four scores. If you want to discuss a case before saving it, leave Command Prompt at the class prompt and share the case ID and displayed text for a second opinion. Enter the final class and scores yourself. The scores are then checkpointed locally. If you stop and return later, rerun the same command with `--resume` added before `--reviewer`.
+The full report is local and must not be committed because it contains raw model answers. The aggregate assessment and release blockers are documented in [the trust assessment](docs/trust-assessment-2026-10-22.md). If the prompt, model, filtering, or response behavior changes, generate a new automatic report and review that exact output; these ratings cannot be transferred.
 
 For every case, record one review class:
 

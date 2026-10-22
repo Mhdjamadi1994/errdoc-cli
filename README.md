@@ -210,11 +210,11 @@ You must already have a working Docker or Podman runtime and a local image. The 
 
 ## Help and project status
 
-errdoc is an early pre-release project. It is not a debugger and cannot promise a correct explanation for every error. The current prompt's 51 model-backed cases have a fresh automatic evaluation, but they do not yet have current human ratings. Earlier human ratings belong to an older prompt and are not evidence for today's answers. See [QUALITY_GATES.md](QUALITY_GATES.md) for test results and release blockers.
+errdoc is an early pre-release project. It is not a debugger and cannot promise a correct explanation for every error. A human reviewed all 51 saved answers from the current model prompt: the mean score was 9.39/10, but only 1 of 51 was labeled fully correct; the other 50 were labeled partially correct. The beta gate therefore fails. One unsupported claim and one answer over 120 words also remain. See the [trust assessment](docs/trust-assessment-2026-10-22.md) and [quality gates](QUALITY_GATES.md) for the evidence and remaining release blockers.
 
 ### Why isn't it rated 10/10 yet?
 
-Passing tests shows that errdoc works in the tested situations. It does not prove that every AI explanation is correct or that every secret will be found. The 51 answers from the current model prompt still need human review; the automatic score checks words and patterns, not meaning. TestPyPI installation, PyPI name ownership, and a broader privacy review also remain unverified. Until those checks are complete, a perfect trust score would overstate the evidence.
+Passing tests shows that errdoc works in the tested situations. It does not prove that every AI explanation is correct or that every secret will be found. Human review of the current 51 answers is complete, but only one was labeled fully correct; the automatic report also flags one unsupported claim and one overlong answer. TestPyPI installation, PyPI name ownership, and a broader privacy review remain unverified. The [trust assessment](docs/trust-assessment-2026-10-22.md) explains the 5/10 readiness score and evidence; the automatic score checks words and patterns, not meaning.
 
 - [**Review the tests and release gates →**](QUALITY_GATES.md)
 - [**Report a security issue privately →**](SECURITY.md)
